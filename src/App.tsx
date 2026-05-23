@@ -1,0 +1,34 @@
+import { Routes, Route } from "react-router-dom";
+import { Layout } from "@/components/Layout";
+import Home from "@/pages/Home";
+import Services from "@/pages/Services";
+import Company from "@/pages/Company";
+import Careers from "@/pages/Careers";
+import Contact from "@/pages/Contact";
+import Templates from "@/pages/Templates";
+import Cart from "@/pages/Cart";
+import Checkout from "@/pages/Checkout";
+import LegalPage from "@/pages/Legal";
+import NotFound from "@/pages/NotFound";
+import { LEGAL_PAGES } from "@/pages/legal-content";
+
+export default function App() {
+  return (
+    <Routes>
+      <Route element={<Layout />}>
+        <Route index element={<Home />} />
+        <Route path="services" element={<Services />} />
+        <Route path="company" element={<Company />} />
+        <Route path="careers" element={<Careers />} />
+        <Route path="contact" element={<Contact />} />
+        <Route path="templates" element={<Templates />} />
+        <Route path="templates/cart" element={<Cart />} />
+        <Route path="templates/checkout" element={<Checkout />} />
+        {LEGAL_PAGES.map((p) => (
+          <Route key={p.slug} path={p.slug} element={<LegalPage slug={p.slug} />} />
+        ))}
+        <Route path="*" element={<NotFound />} />
+      </Route>
+    </Routes>
+  );
+}
