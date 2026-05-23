@@ -1,0 +1,144 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@theme {
+  --color-surface: #e8edf0;
+  --color-primary: #0b4650;
+  --color-accent: #e6ff2b;
+  --color-shadow-dark: #c5cdd4;
+  --color-shadow-light: #ffffff;
+  --color-text-body: #0b4650;
+  --color-text-muted: #4a6670;
+
+  --font-display: "Ubuntu", system-ui, sans-serif;
+  --font-sans: "Inter", system-ui, sans-serif;
+
+  --radius: 1.25rem;
+}
+
+/* Tokens consumed by shadcn primitives (kept on the Capacitiq palette) */
+:root {
+  --background: #e8edf0;
+  --foreground: #0b4650;
+  --card: #e8edf0;
+  --card-foreground: #0b4650;
+  --popover: #e8edf0;
+  --popover-foreground: #0b4650;
+  --primary: #0b4650;
+  --primary-foreground: #ffffff;
+  --secondary: #e8edf0;
+  --secondary-foreground: #0b4650;
+  --muted: #e8edf0;
+  --muted-foreground: #4a6670;
+  --accent: #e6ff2b;
+  --accent-foreground: #0b4650;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --border: #c5cdd4;
+  --input: #c5cdd4;
+  --ring: #0b4650;
+  --radius: 1.25rem;
+}
+
+@layer base {
+  * { border-color: var(--color-shadow-dark); }
+  html, body, #root { min-height: 100%; }
+  body {
+    background-color: var(--color-surface);
+    color: var(--color-text-body);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    color: var(--color-primary);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+}
+
+@layer components {
+  .neu-raised {
+    background-color: var(--color-surface);
+    border-radius: 20px;
+    box-shadow: 8px 8px 16px var(--color-shadow-dark), -8px -8px 16px var(--color-shadow-light);
+  }
+  .neu-raised-sm {
+    background-color: var(--color-surface);
+    border-radius: 16px;
+    box-shadow: 6px 6px 12px var(--color-shadow-dark), -6px -6px 12px var(--color-shadow-light);
+  }
+  .neu-inset {
+    background-color: var(--color-surface);
+    border-radius: 12px;
+    box-shadow: inset 4px 4px 8px var(--color-shadow-dark), inset -4px -4px 8px var(--color-shadow-light);
+    border: none;
+    outline: none;
+  }
+  .neu-inset:focus {
+    box-shadow: inset 4px 4px 8px var(--color-shadow-dark), inset -4px -4px 8px var(--color-shadow-light),
+      0 0 0 2px var(--color-accent);
+  }
+  .btn-cta {
+    background-color: var(--color-accent);
+    color: var(--color-primary);
+    font-family: var(--font-display);
+    font-weight: 700;
+    border-radius: 50px;
+    box-shadow: 6px 6px 12px var(--color-shadow-dark), -6px -6px 12px var(--color-shadow-light);
+    border: none;
+    padding: 14px 32px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .btn-cta:hover { transform: translateY(-1px); }
+  .btn-cta:active {
+    transform: translateY(0);
+    box-shadow: inset 4px 4px 8px var(--color-shadow-dark), inset -4px -4px 8px var(--color-shadow-light);
+  }
+  .btn-cta:disabled { opacity: 0.6; cursor: not-allowed; }
+  .btn-ghost {
+    background-color: var(--color-surface);
+    color: var(--color-primary);
+    font-family: var(--font-display);
+    font-weight: 700;
+    border-radius: 50px;
+    box-shadow: 6px 6px 12px var(--color-shadow-dark), -6px -6px 12px var(--color-shadow-light);
+    border: none;
+    padding: 14px 32px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .btn-ghost:hover { transform: translateY(-1px); }
+  .btn-ghost:active {
+    box-shadow: inset 4px 4px 8px var(--color-shadow-dark), inset -4px -4px 8px var(--color-shadow-light);
+  }
+  .logo-tile {
+    background-color: var(--color-primary);
+    border-radius: 10px;
+    padding: 8px;
+    width: 44px;
+    height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .logo-tile img { width: 100%; height: 100%; object-fit: contain; }
+  .font-display { font-family: var(--font-display); }
+  .text-muted { color: var(--color-text-muted); }
+}
