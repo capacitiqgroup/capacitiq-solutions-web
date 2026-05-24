@@ -65,6 +65,7 @@ export function Footer() {
               <li><Link to="/template-policy">Template Licence</Link></li>
               <li><Link to="/refund-policy">Refund Policy</Link></li>
               <li><Link to="/cookie-policy">Cookie Policy</Link></li>
+              <li><Link to="/spotter-policy">Spotter Policy</Link></li>
             </ul>
           </div>
         </div>

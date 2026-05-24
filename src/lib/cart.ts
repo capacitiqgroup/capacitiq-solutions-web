@@ -9,6 +9,9 @@ export type CartItem = {
   preview_image: string | null;
 };
 
+export const formatZARDetailed = (cents: number) =>
+  cents === 0 ? "FREE" : `R${(cents / 100).toLocaleString("en-ZA", { maximumFractionDigits: 0 })}`;
+
 type CartState = {
   items: CartItem[];
   addItem: (item: CartItem) => void;

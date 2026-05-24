@@ -189,9 +189,11 @@ export type Database = {
           created_at: string
           description: string | null
           id: string
+          launch_price: number | null
           name: string
           preview_image: string | null
           price: number
+          standard_price: number | null
           status: string
         }
         Insert: {
@@ -200,9 +202,11 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          launch_price?: number | null
           name: string
           preview_image?: string | null
           price: number
+          standard_price?: number | null
           status?: string
         }
         Update: {
@@ -211,9 +215,11 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          launch_price?: number | null
           name?: string
           preview_image?: string | null
           price?: number
+          standard_price?: number | null
           status?: string
         }
         Relationships: []

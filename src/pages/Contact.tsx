@@ -30,16 +30,10 @@ export default function Contact() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          subject: `New Contact Form Submission — ${form.fullName}`,
           to: "hello@capacitiq.co.za",
-          text: [
-            "New Contact Form Submission", "",
-            `Name: ${form.fullName}`, `Email: ${form.email}`, `Phone: ${form.phone}`, `Business Name: ${form.businessName}`, "",
-            `Business Overview: ${form.overview}`, `Operating For: ${form.operating}`, "",
-            `Services Interested In: ${form.services.join(", ")}`, `What They Need Help With: ${form.helpWith}`, "",
-            `Budget Range: ${form.budget}`, `Timeline: ${form.timeline}`, `Ready to Move Forward: ${form.ready}`, `Additional Notes: ${form.notes}`, "",
-            `Submitted: ${new Date().toISOString()}`,
-          ].join("\n"),
+          subject: `New Contact Form Submission — ${form.fullName}`,
+          type: "contact",
+          payload: form,
         }),
       });
     } catch {/* preview */}
@@ -148,8 +142,10 @@ export default function Contact() {
               <div className="neu-raised-sm rounded-full px-4 py-2.5 inline-flex items-center gap-2 text-sm w-full"><Phone size={16} /> WhatsApp: {CONTACT.phone}</div>
               <div className="neu-raised-sm rounded-full px-4 py-2.5 inline-flex items-center gap-2 text-sm w-full"><Mail size={16} /> {CONTACT.email}</div>
               <div className="neu-raised-sm rounded-2xl px-4 py-3 text-sm">
-                <div className="flex items-center gap-2 font-display font-bold"><Clock size={16} /> Hours</div>
-                <p className="text-xs text-muted mt-2">Mon–Fri 9:00–17:00<br/>Sat & Sun: Closed</p>
+                <div className="flex items-center gap-2 font-display font-bold"><Clock size={16} /> Response Time</div>
+                <p className="text-xs text-muted mt-2">
+                  We will get back to you within one business day. Business hours are Monday to Friday, 9:00am to 5:00pm.
+                </p>
               </div>
             </div>
           </div>
