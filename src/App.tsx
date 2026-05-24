@@ -8,6 +8,9 @@ import Contact from "@/pages/Contact";
 import Templates from "@/pages/Templates";
 import Cart from "@/pages/Cart";
 import Checkout from "@/pages/Checkout";
+import Blog from "@/pages/Blog";
+import Portfolio from "@/pages/Portfolio";
+import SpotterPolicy from "@/pages/SpotterPolicy";
 import LegalPage from "@/pages/Legal";
 import NotFound from "@/pages/NotFound";
 import { LEGAL_PAGES } from "@/pages/legal-content";
@@ -24,6 +27,9 @@ export default function App() {
         <Route path="templates" element={<Templates />} />
         <Route path="templates/cart" element={<Cart />} />
         <Route path="templates/checkout" element={<Checkout />} />
+        <Route path="blog" element={<Blog />} />
+        <Route path="portfolio" element={<Portfolio />} />
+        <Route path="spotter-policy" element={<SpotterPolicy />} />
         {LEGAL_PAGES.map((p) => (
           <Route key={p.slug} path={p.slug} element={<LegalPage slug={p.slug} />} />
         ))}
