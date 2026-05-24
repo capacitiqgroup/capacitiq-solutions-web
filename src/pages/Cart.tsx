@@ -31,7 +31,7 @@ export default function Cart() {
                         <h3 className="font-display font-bold text-sm truncate">{it.name}</h3>
                         <p className="text-xs italic text-muted">{it.category}</p>
                       </div>
-                      <span className="font-display font-bold text-sm">{formatZAR(it.price)}</span>
+                      <span className="font-display font-bold text-sm">{it.price === 0 ? "FREE" : formatZAR(it.price)}</span>
                       <button onClick={() => removeItem(it.id)} aria-label="Remove" className="neu-raised-sm rounded-xl w-10 h-10 inline-flex items-center justify-center">
                         <Trash2 size={16} color="#0b4650" />
                       </button>
@@ -44,11 +44,11 @@ export default function Cart() {
               <aside className="neu-raised rounded-3xl p-6 h-fit lg:sticky lg:top-28">
                 <h2 className="font-display font-bold text-lg">Cart Summary</h2>
                 <div className="space-y-2 text-sm mt-4">
-                  <div className="flex justify-between"><span>Subtotal</span><span>{formatZAR(total())}</span></div>
+                  <div className="flex justify-between"><span>Subtotal</span><span>{total() === 0 ? "FREE" : formatZAR(total())}</span></div>
                   <div className="flex justify-between"><span>Shipping</span><span>FREE (Digital)</span></div>
                 </div>
                 <div className="border-t border-[#c5cdd4] mt-4 pt-4 flex justify-between font-display font-bold text-lg">
-                  <span>Total</span><span>{formatZAR(total())}</span>
+                  <span>Total</span><span>{total() === 0 ? "FREE" : formatZAR(total())}</span>
                 </div>
                 <Link to="/templates/checkout" className="btn-cta mt-6 w-full">Proceed to Checkout</Link>
                 <p className="text-xs text-muted mt-4">Visa · Mastercard</p>
