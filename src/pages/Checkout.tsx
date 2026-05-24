@@ -26,6 +26,7 @@ export default function Checkout() {
   }
 
   const totalCents = cart.total();
+  const isFree = totalCents === 0;
 
   function formatCardNumber(v: string) {
     return v.replace(/\D/g, "").slice(0, 16).replace(/(.{4})/g, "$1 ").trim();
@@ -33,6 +34,33 @@ export default function Checkout() {
   function formatExpiry(v: string) {
     const d = v.replace(/\D/g, "").slice(0, 4);
     return d.length > 2 ? `${d.slice(0, 2)}/${d.slice(2)}` : d;
+  }
+
+  async function chargeServer(token: string | null, newOrderId: string) {
+    const resp = await fetch("/api/charge", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        token, currency: "ZAR", orderId: newOrderId,
+        customerEmail: info.email, customerName: info.fullName,
+        itemIds: cart.items.map((i) => i.id),
+      }),
+    });
+    return await resp.json();
+  }
+
+  async function claimFree() {
+    if (!info.fullName || !info.email) return;
+    setError(null);
+    setProcessing(true);
+    const newOrderId = crypto.randomUUID();
+    try {
+      const r = await chargeServer(null, newOrderId);
+      if (r.success) { setOrderId(newOrderId); cart.clear(); setStep(2); }
+      else { setError(r.error || "Could not complete."); setProcessing(false); }
+    } catch (e: any) {
+      setError("This only works on Vercel deployment. " + (e?.message || ""));
+      setProcessing(false);
+    }
   }
 
   async function pay() {
@@ -52,11 +80,7 @@ export default function Checkout() {
       async (result: any) => {
         if (result.error) { setError(result.error.message); setProcessing(false); return; }
         try {
-          const resp = await fetch("/api/charge", {
-            method: "POST", headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ token: result.id, amountInCents: totalCents, currency: "ZAR", orderId: newOrderId, customerEmail: info.email, customerName: info.fullName, items: cart.items }),
-          });
-          const r = await resp.json();
+          const r = await chargeServer(result.id, newOrderId);
           if (r.success) { setOrderId(newOrderId); cart.clear(); setStep(2); }
           else { setError(r.error || "Payment failed."); setProcessing(false); }
         } catch (e: any) {
@@ -72,10 +96,10 @@ export default function Checkout() {
       <Seo title="Secure Checkout | Capacitiq" description="Secure Capacitiq template checkout." path="/templates/checkout" />
       <section className="px-4 sm:px-6 pt-10 pb-16">
         <div className="max-w-7xl mx-auto">
-          <h1 className="font-display font-bold text-4xl">Secure Checkout</h1>
+          <h1 className="font-display font-bold text-4xl">{isFree ? "Get Your Templates" : "Secure Checkout"}</h1>
 
           <div className="mt-6 flex flex-wrap gap-2">
-            {[{ i: User, l: "Information" }, { i: CreditCard, l: "Payment" }, { i: CheckCircle, l: "Confirmation" }].map((s, i) => {
+            {[{ i: User, l: "Information" }, { i: CreditCard, l: isFree ? "Confirm" : "Payment" }, { i: CheckCircle, l: "Confirmation" }].map((s, i) => {
               const active = i === step, complete = i < step;
               return (
                 <span key={i} className={`rounded-full px-4 py-2 text-xs font-display font-bold inline-flex items-center gap-2 ${active ? "" : "neu-raised-sm"}`} style={active ? { backgroundColor: "#e6ff2b", color: "#0b4650" } : {}}>
@@ -94,34 +118,69 @@ export default function Checkout() {
                   <CInput label="Full Name *" value={info.fullName} onChange={(v) => setInfo({ ...info, fullName: v })} />
                   <CInput label="Email Address *" type="email" value={info.email} onChange={(v) => setInfo({ ...info, email: v })} />
                   <CInput label="Company Name" value={info.company} onChange={(v) => setInfo({ ...info, company: v })} />
-                  <h2 className="font-display font-bold text-xl pt-4">Billing Details</h2>
-                  <CInput label="Billing Address *" value={info.address} onChange={(v) => setInfo({ ...info, address: v })} />
-                  <CInput label="City *" value={info.city} onChange={(v) => setInfo({ ...info, city: v })} />
-                  <div>
-                    <label className="font-display text-sm block mb-2">Country *</label>
-                    <select className="neu-inset w-full p-3 text-sm" value={info.country} onChange={(e) => setInfo({ ...info, country: e.target.value })}>
-                      {["South Africa", "Namibia", "Botswana", "Lesotho", "Eswatini", "Zimbabwe", "Other"].map((c) => <option key={c}>{c}</option>)}
-                    </select>
-                  </div>
-                  <CInput label="Zip or Postal Code *" value={info.zip} onChange={(v) => setInfo({ ...info, zip: v })} />
-                  <button className="btn-cta w-full" disabled={!info.fullName || !info.email || !info.address || !info.city || !info.zip} onClick={() => setStep(1)}>Continue to Payment</button>
+                  {!isFree && (
+                    <>
+                      <h2 className="font-display font-bold text-xl pt-4">Billing Details</h2>
+                      <CInput label="Billing Address *" value={info.address} onChange={(v) => setInfo({ ...info, address: v })} />
+                      <CInput label="City *" value={info.city} onChange={(v) => setInfo({ ...info, city: v })} />
+                      <div>
+                        <label className="font-display text-sm block mb-2">Country *</label>
+                        <select className="neu-inset w-full p-3 text-sm" value={info.country} onChange={(e) => setInfo({ ...info, country: e.target.value })}>
+                          {["South Africa", "Namibia", "Botswana", "Lesotho", "Eswatini", "Zimbabwe", "Other"].map((c) => <option key={c}>{c}</option>)}
+                        </select>
+                      </div>
+                      <CInput label="Zip or Postal Code *" value={info.zip} onChange={(v) => setInfo({ ...info, zip: v })} />
+                    </>
+                  )}
+                  <button
+                    className="btn-cta w-full"
+                    disabled={!info.fullName || !info.email || (!isFree && (!info.address || !info.city || !info.zip))}
+                    onClick={() => setStep(1)}
+                  >
+                    {isFree ? "Continue" : "Continue to Payment"}
+                  </button>
                 </div>
               )}
 
               {step === 1 && (
                 <div className="space-y-4">
-                  <h2 className="font-display font-bold text-xl">Capacitiq Pay</h2>
-                  <CInput label="Cardholder Name *" placeholder="Name on card" value={card.name} onChange={(v) => setCard({ ...card, name: v })} />
-                  <CInput label="Card Number *" placeholder="0000 0000 0000 0000" value={card.number} onChange={(v) => setCard({ ...card, number: formatCardNumber(v) })} />
-                  <div className="grid grid-cols-2 gap-3">
-                    <CInput label="Expiry Date *" placeholder="MM/YY" value={card.expiry} onChange={(v) => setCard({ ...card, expiry: formatExpiry(v) })} />
-                    <CInput label="CVV *" type="password" placeholder="CVV" value={card.cvv} onChange={(v) => setCard({ ...card, cvv: v.replace(/\D/g, "").slice(0, 4) })} />
-                  </div>
-                  <p className="text-xs text-muted inline-flex items-center gap-1.5"><Lock size={14} /> Secured by Yoco. Capacitiq does not store your card details.</p>
-                  <button className="text-sm text-muted" onClick={() => setStep(0)}>← Back to Information</button>
-                  <button className="btn-cta w-full" style={{ height: 52 }} disabled={processing} onClick={pay}>
-                    {processing ? "Processing payment..." : `Pay ${formatZAR(totalCents)}`}
-                  </button>
+                  {isFree ? (
+                    <>
+                      <h2 className="font-display font-bold text-xl">You are getting these for free.</h2>
+                      <div className="space-y-3">
+                        {cart.items.map((it) => (
+                          <div key={it.id} className="flex items-center gap-3 neu-raised-sm rounded-2xl p-3">
+                            {it.preview_image && <img src={it.preview_image} alt={it.name} className="w-14 h-14 rounded-xl object-cover" />}
+                            <div className="flex-1 min-w-0">
+                              <p className="font-display font-bold text-sm">{it.name}</p>
+                              <p className="text-xs italic text-muted">{it.category}</p>
+                            </div>
+                            <span className="text-xs font-display font-bold rounded-full px-2.5 py-1" style={{ backgroundColor: "#e6ff2b", color: "#0b4650" }}>FREE</span>
+                          </div>
+                        ))}
+                      </div>
+                      <p className="text-sm text-muted">Your Canva template links will be emailed to <strong>{info.email}</strong>.</p>
+                      <button className="text-sm text-muted" onClick={() => setStep(0)}>← Back to Information</button>
+                      <button className="btn-cta w-full" style={{ height: 52 }} disabled={processing} onClick={claimFree}>
+                        {processing ? "Processing…" : "Get Your Templates Free"}
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <h2 className="font-display font-bold text-xl">Capacitiq Pay</h2>
+                      <CInput label="Cardholder Name *" placeholder="Name on card" value={card.name} onChange={(v) => setCard({ ...card, name: v })} />
+                      <CInput label="Card Number *" placeholder="0000 0000 0000 0000" value={card.number} onChange={(v) => setCard({ ...card, number: formatCardNumber(v) })} />
+                      <div className="grid grid-cols-2 gap-3">
+                        <CInput label="Expiry Date *" placeholder="MM/YY" value={card.expiry} onChange={(v) => setCard({ ...card, expiry: formatExpiry(v) })} />
+                        <CInput label="CVV *" type="password" placeholder="CVV" value={card.cvv} onChange={(v) => setCard({ ...card, cvv: v.replace(/\D/g, "").slice(0, 4) })} />
+                      </div>
+                      <p className="text-xs text-muted inline-flex items-center gap-1.5"><Lock size={14} /> Secured by Yoco. Capacitiq does not store your card details.</p>
+                      <button className="text-sm text-muted" onClick={() => setStep(0)}>← Back to Information</button>
+                      <button className="btn-cta w-full" style={{ height: 52 }} disabled={processing} onClick={pay}>
+                        {processing ? "Processing payment..." : `Pay ${formatZAR(totalCents)}`}
+                      </button>
+                    </>
+                  )}
                   {error && (
                     <div className="neu-raised-sm rounded-2xl p-4 border-l-4" style={{ borderLeftColor: "#dc2626" }}>
                       <div className="flex items-start gap-2 text-sm" style={{ color: "#dc2626" }}>
@@ -139,8 +198,8 @@ export default function Checkout() {
               {step === 2 && (
                 <div className="text-center py-10">
                   <CheckCircle size={64} className="mx-auto" color="#e6ff2b" />
-                  <h2 className="font-display font-bold text-2xl mt-4">Payment Successful.</h2>
-                  <p className="mt-3 max-w-md mx-auto">Thank you for your purchase. Your Canva template link has been sent to {info.email}. Please check your inbox and spam folder. A Canva account is required to access your template.</p>
+                  <h2 className="font-display font-bold text-2xl mt-4">{isFree ? "All done." : "Payment Successful."}</h2>
+                  <p className="mt-3 max-w-md mx-auto">Thank you. Your Canva template link has been sent to {info.email}. Please check your inbox and spam folder. A Canva account is required to access your template.</p>
                   <p className="text-xs text-muted mt-4">Order reference: {orderId}</p>
                   <div className="mt-6 flex flex-col items-center gap-2">
                     <button className="btn-cta" onClick={() => navigate("/templates")}>Browse More Templates</button>
@@ -161,16 +220,16 @@ export default function Checkout() {
                         <p className="font-display font-bold text-sm truncate">{it.name}</p>
                         <p className="text-xs italic text-muted">{it.category}</p>
                       </div>
-                      <span className="text-sm font-display">{formatZAR(it.price)}</span>
+                      <span className="text-sm font-display">{it.price === 0 ? "FREE" : formatZAR(it.price)}</span>
                     </div>
                   ))}
                 </div>
                 <div className="border-t border-[#c5cdd4] mt-4 pt-4 space-y-1 text-sm">
-                  <div className="flex justify-between"><span>Subtotal</span><span>{formatZAR(totalCents)}</span></div>
+                  <div className="flex justify-between"><span>Subtotal</span><span>{isFree ? "FREE" : formatZAR(totalCents)}</span></div>
                   <div className="flex justify-between"><span>Shipping</span><span>FREE (Digital)</span></div>
                 </div>
                 <div className="border-t border-[#c5cdd4] mt-2 pt-3 flex justify-between font-display font-bold text-lg">
-                  <span>Total</span><span>{formatZAR(totalCents)}</span>
+                  <span>Total</span><span>{isFree ? "FREE" : formatZAR(totalCents)}</span>
                 </div>
                 <p className="text-xs text-muted mt-4">You will receive a download link via email.</p>
                 <p className="text-xs text-muted mt-3">Standard packs are licensed for personal or business use only. All digital product sales are final. A Canva account is required.</p>
