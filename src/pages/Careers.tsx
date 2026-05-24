@@ -3,6 +3,7 @@ import { Plus, Minus, CheckCircle } from "lucide-react";
 import { Seo } from "@/lib/seo";
 import { supabase } from "@/integrations/supabase/client";
 import { Modal } from "@/components/Modal";
+import { SpotterModal } from "@/components/SpotterModal";
 
 type Career = {
   id: string; title: string; location: string | null; type: string | null; status: string;
@@ -30,6 +31,7 @@ export default function Careers() {
   const [careers, setCareers] = useState<Career[]>([]);
   const [open, setOpen] = useState<string | null>(null);
   const [applyRole, setApplyRole] = useState<string | null>(null);
+  const [spotterOpen, setSpotterOpen] = useState(false);
 
   useEffect(() => {
     supabase.from("careers").select("*").then(({ data }) => setCareers((data as any) || []));
@@ -94,7 +96,17 @@ export default function Careers() {
                         </div>
                       )}
                       {c.compensation && <p><strong className="font-display">Compensation:</strong> <span className="text-muted">{c.compensation}</span></p>}
-                      {isOpen && <button className="btn-cta" onClick={() => setApplyRole(c.title)}>Apply Now</button>}
+                      {isOpen && (
+                        <button
+                          className="btn-cta"
+                          onClick={() => {
+                            if (/spotter/i.test(c.title)) setSpotterOpen(true);
+                            else setApplyRole(c.title);
+                          }}
+                        >
+                          Apply Now
+                        </button>
+                      )}
                     </div>
                   )}
                 </div>
@@ -105,6 +117,7 @@ export default function Careers() {
       </section>
 
       {applyRole && <ApplyModal role={applyRole} onClose={() => setApplyRole(null)} />}
+      <SpotterModal open={spotterOpen} onClose={() => setSpotterOpen(false)} />
     </>
   );
 }
