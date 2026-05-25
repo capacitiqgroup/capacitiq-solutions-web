@@ -127,8 +127,11 @@ function ApplyModal({ role, onClose }: { role: string; onClose: () => void }) {
   const [form, setForm] = useState({ fullName: "", email: "", phone: "", location: "", why: "", experience: "", linkedin: "", consent: false });
   const submit = async () => {
     if (!form.consent || form.why.length < 100) return;
-    await supabase.from("submissions").insert({ kind: "career_application", data: { role, ...form } });
     try {
+      await fetch("/api/submit", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ kind: "career_application", data: { role, ...form } }),
+      });
       await fetch("/api/send-career-application", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ role, ...form }),

@@ -20,7 +20,7 @@ const ORG_LD = {
   sameAs: [
     "https://www.linkedin.com/company/capacitiq",
     "https://www.tiktok.com/@capacitiq",
-    "https://www.instagram.com/capacitiq",
+    "https://www.instagram.com/capacitiq_za",
   ],
   address: {
     "@type": "PostalAddress",

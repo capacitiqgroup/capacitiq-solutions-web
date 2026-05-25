@@ -75,7 +75,7 @@ export function Footer() {
             <h4 className="font-display text-sm uppercase tracking-wider mb-4 text-center">Follow Us</h4>
             <div className="flex items-center gap-3">
               <SocialBtn href="https://www.linkedin.com/company/capacitiq"><Linkedin size={20} /></SocialBtn>
-              <SocialBtn href="https://www.instagram.com/capacitiq"><Instagram size={20} /></SocialBtn>
+              <SocialBtn href="https://www.instagram.com/capacitiq_za"><Instagram size={20} /></SocialBtn>
               <SocialBtn href="https://www.tiktok.com/@capacitiq"><TikTokIcon size={20} /></SocialBtn>
             </div>
           </div>

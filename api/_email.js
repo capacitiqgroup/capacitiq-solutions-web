@@ -20,7 +20,7 @@ const HEADER = `
         <a href="https://www.linkedin.com/company/capacitiq" style="margin-left:8px;text-decoration:none;border:none;display:inline-block;">
           <img src="${LI}" width="22" height="22" alt="LinkedIn" style="vertical-align:middle;border:0;display:block;" />
         </a>
-        <a href="https://www.instagram.com/capacitiq" style="margin-left:8px;text-decoration:none;border:none;display:inline-block;">
+        <a href="https://www.instagram.com/capacitiq_za" style="margin-left:8px;text-decoration:none;border:none;display:inline-block;">
           <img src="${IG}" width="22" height="22" alt="Instagram" style="vertical-align:middle;border:0;display:block;" />
         </a>
         <a href="https://www.tiktok.com/@capacitiq" style="margin-left:8px;text-decoration:none;border:none;display:inline-block;">
@@ -52,7 +52,7 @@ const FOOTER = `
           <a href="https://www.linkedin.com/company/capacitiq" style="margin-right:6px;text-decoration:none;border:none;display:inline-block;">
             <img src="${LI}" width="18" height="18" alt="LinkedIn" style="vertical-align:middle;border:0;display:block;" />
           </a>
-          <a href="https://www.instagram.com/capacitiq" style="margin-right:6px;text-decoration:none;border:none;display:inline-block;">
+          <a href="https://www.instagram.com/capacitiq_za" style="margin-right:6px;text-decoration:none;border:none;display:inline-block;">
             <img src="${IG}" width="18" height="18" alt="Instagram" style="vertical-align:middle;border:0;display:block;" />
           </a>
           <a href="https://www.tiktok.com/@capacitiq" style="margin-right:12px;text-decoration:none;border:none;display:inline-block;">
@@ -178,11 +178,13 @@ export function genericEmail(textBody) {
 
 export const FROM = "Capacitiq <noreply@capacitiq.co.za>";
 
-export async function sendResend({ to, subject, html }) {
+export async function sendResend({ to, subject, html, attachments }) {
+  const payload = { from: FROM, to, subject, html };
+  if (attachments && attachments.length) payload.attachments = attachments;
   const r = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ from: FROM, to, subject, html }),
+    body: JSON.stringify(payload),
   });
   return { ok: r.ok, data: await r.json() };
 }

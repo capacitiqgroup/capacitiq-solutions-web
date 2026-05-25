@@ -1,9 +1,11 @@
 import { createClient } from "@supabase/supabase-js";
 import { templateDeliveryEmail, sendResend, wrapEmail } from "./_email.js";
+import { buildInvoicePdf, invoiceNumber } from "./_invoice.js";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
   try {
+    // SECURITY: We intentionally ignore any client-sent amountInCents.
     const { token, currency = "ZAR", orderId, customerEmail, customerName, itemIds } = req.body || {};
     if (!Array.isArray(itemIds) || itemIds.length === 0) return res.status(400).json({ success: false, error: "No items" });
     if (!customerEmail || !customerName || !orderId) return res.status(400).json({ success: false, error: "Missing customer info" });
@@ -48,7 +50,16 @@ export default async function handler(req, res) {
       status: isFree ? "free" : "paid",
     });
 
-    // Customer delivery emails (one per template) — recipient is customer's own email
+    // Build invoice PDF once and attach to each delivery email
+    let invoiceAttachment = null;
+    try {
+      const pdfBuf = await buildInvoicePdf({ orderId, customerName, customerEmail, templates, totalCents });
+      invoiceAttachment = {
+        filename: `Capacitiq-Invoice-${invoiceNumber(orderId)}.pdf`,
+        content: pdfBuf.toString("base64"),
+      };
+    } catch {/* invoice failure should not block delivery */}
+
     for (const tmpl of templates) {
       if (!tmpl.canva_link) continue;
       await sendResend({
@@ -59,8 +70,19 @@ export default async function handler(req, res) {
           priceCents: tmpl.launch_price, isFree: tmpl.launch_price === 0,
           paymentMethod: isFree ? "Free download" : "Card via Yoco",
         }),
+        attachments: invoiceAttachment ? [invoiceAttachment] : undefined,
       });
     }
+
+    // Queue review request (3 days later)
+    try {
+      await supabase.from("review_requests").insert({
+        customer_email: customerEmail,
+        customer_name: customerName,
+        template_name: templates.map((t) => t.name).join(", "),
+        order_id: orderId,
+      });
+    } catch {/* non-blocking */}
 
     // Internal notification
     const summary = templates.map((t) => `• ${t.name} — ${t.launch_price === 0 ? "FREE" : "R" + (t.launch_price / 100).toFixed(0)}`).join("<br/>");
