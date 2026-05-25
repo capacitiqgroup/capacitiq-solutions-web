@@ -25,17 +25,11 @@ export function SpotterModal({ open, onClose }: { open: boolean; onClose: () => 
     e.preventDefault();
     if (!canSubmit) return;
     setSubmitting(true);
-    await supabase.from("submissions").insert({ kind: "spotter", data: form });
     try {
-      await fetch("/api/send-email", {
+      await fetch("/api/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          to: "hello@capacitiq.co.za",
-          subject: `New Spotter Referral — ${form.leadCompany}`,
-          type: "spotter",
-          payload: form,
-        }),
+        body: JSON.stringify({ kind: "spotter", data: form }),
       });
     } catch { /* preview env */ }
     setSubmitting(false);
