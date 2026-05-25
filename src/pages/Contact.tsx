@@ -4,7 +4,7 @@ import { Seo } from "@/lib/seo";
 import { supabase } from "@/integrations/supabase/client";
 import { CONTACT } from "@/lib/site";
 
-const SERVICES = ["Business Strategy and Operations", "Marketing and Growth", "Public Relations", "Virtual Assistance", "Graphic Design", "Web Presence", "Not Sure", "Other"];
+const SERVICES = ["Business Strategy and Operations", "Marketing and Growth", "Public Relations", "Virtual Assistance", "Graphic Design", "Not Sure", "Other"];
 const OPERATING = ["Less than 6 months", "6 to 12 months", "1 to 3 years", "3 plus years"];
 const BUDGETS = ["Below R2,000", "R2,000 to R5,000", "R5,000 to R10,000", "R10,000 plus"];
 const TIMELINES = ["Immediately", "Within 1 month", "1 to 2 months", "3 plus months"];
@@ -24,17 +24,11 @@ export default function Contact() {
 
   async function submit() {
     if (!form.consent) return;
-    await supabase.from("submissions").insert({ kind: "contact", data: form });
     try {
-      await fetch("/api/send-email", {
+      await fetch("/api/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          to: "hello@capacitiq.co.za",
-          subject: `New Contact Form Submission — ${form.fullName}`,
-          type: "contact",
-          payload: form,
-        }),
+        body: JSON.stringify({ kind: "contact", data: form }),
       });
     } catch {/* preview */}
     setDone(true);
@@ -59,8 +53,8 @@ export default function Contact() {
             {done ? (
               <div className="text-center py-10">
                 <CheckCircle size={56} className="mx-auto" color="#e6ff2b" />
-                <h2 className="font-display font-bold text-2xl mt-4">Message Sent.</h2>
-                <p className="text-sm text-muted mt-2">We will be in touch within 2 business days.</p>
+                <h2 className="font-display font-bold text-2xl mt-4">Message received.</h2>
+                <p className="text-sm text-muted mt-2 max-w-md mx-auto">We will get back to you within one business day during business hours, Monday to Friday, 9:00am to 5:00pm.</p>
               </div>
             ) : (
               <>
