@@ -178,11 +178,13 @@ export function genericEmail(textBody) {
 
 export const FROM = "Capacitiq <noreply@capacitiq.co.za>";
 
-export async function sendResend({ to, subject, html }) {
+export async function sendResend({ to, subject, html, attachments }) {
+  const payload = { from: FROM, to, subject, html };
+  if (attachments && attachments.length) payload.attachments = attachments;
   const r = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ from: FROM, to, subject, html }),
+    body: JSON.stringify(payload),
   });
   return { ok: r.ok, data: await r.json() };
 }
