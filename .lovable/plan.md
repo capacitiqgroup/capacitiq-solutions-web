@@ -1,72 +1,68 @@
-# Capacitiq Solutions — Phase 1 + 2 Build Plan
+## Capacitiq Day 2 — Security, Cart/Checkout, Blog, Portfolio, Reviews, SEO
 
-## Important context up front
+Massive multi-priority scope. Admin panel is explicitly deferred. Below is the execution plan grouped by priority. I'll execute sequentially in one pass.
 
-- **Stack swap is destructive.** I'll tear out TanStack Start (root, routes, server.ts, start.ts, wrangler.jsonc, vite.config.ts) and replace with a plain Vite + React + React Router DOM SPA. The new project will be Vercel-deploy-ready (with `vercel.json` and `/api/*.js` serverless functions per spec).
-- **Lovable Cloud, not the spec's Supabase project.** You picked Lovable Cloud, so the URL `rmtqjkjzfdkcuhrhuaiy.supabase.co` won't be used. Lovable Cloud provisions its own Supabase project; I'll wire env vars to that one. Migrations, RLS, and seed data run there.
-- **Preview limitation:** Lovable's preview can't execute `/api/*.js` Vercel serverless functions — those only run after you deploy to Vercel. So in the Lovable preview, the **checkout/payment flow won't actually charge a card or send emails**. It'll work fully once deployed to Vercel with the env vars set. I can optionally mirror the `/api/charge` logic as a Lovable Cloud edge function for preview testing — say the word.
-- **Secrets needed before Phase 2 checkout works in production:** `RESEND_API_KEY`, `VITE_YOCO_PUBLIC_KEY`, `YOCO_SECRET_KEY`. I'll request these via the secret tool when we get to checkout wiring.
+### Priority 0 — Security
+1. **`/api/charge.js`** — already server-calculates totals from `itemIds` (verified). Add explicit guard to ignore any client-sent `amountInCents`. Confirm 400 on invalid IDs (already done).
+2. **`/api/send-email.js`** — already has allowlist. Add: in-memory IP rate limit (5 req / 60s), strict `type` enum (`contact|spotter|pricing-guide|waitlist|career-application`).
+3. **Submissions table** — migration: drop `anyone insert submissions` policy, replace with `false` (service-role only). Route all submissions through new `/api/submit.js` that validates `kind` enum, string lengths <10000, required fields, then inserts via service role.
 
-## Phase 1 — Public site, design system, legal
+### Priority 1 — Cart & Checkout
+4. **CartProvider context** wrapping app (`src/lib/cart.tsx`) — replaces Zustand store; persists to `localStorage["capacitiq_cart"]`. Keep same API (`addItem`, `removeItem`, `clear`, `total`, `has`).
+5. **Navbar** — add `ShoppingCart` icon with lime badge (count > 0), links `/templates/cart`.
+6. **Templates page** — image + name link to `/templates/:id`. Add-to-cart button stays.
+7. **New route `/templates/:templateId`** (`TemplateDetail.tsx`) — full preview, H1, category, prices, FREE badge, full description, lime Add to Cart, note, back link, SEO.
+8. **Templates page loading flash fix** — render grid wrapper but no empty state until `loaded` flag flips.
 
-### Stack reset
-- Remove: `src/routes/`, `src/router.tsx`, `src/server.ts`, `src/start.ts`, `src/routeTree.gen.ts`, `wrangler.jsonc`, TanStack-specific vite config.
-- Install: `react-router-dom`, `lucide-react`, `@supabase/supabase-js` (already there via Cloud).
-- New entry: `src/main.tsx` mounts `<BrowserRouter>` → `<App>` with `<Routes>` for all public routes.
-- Add `vercel.json` rewrite rule per spec.
-- Add Google Fonts (Ubuntu + Inter) and Yoco SDK `<script>` to `index.html`. Set `<html lang="en-ZA">`.
+### Priority 2 — Contact copy
+9. Update Contact page two strings exactly as specified.
 
-### Design system (`src/index.css`)
-CSS custom properties for the neumorphic palette (`--surface`, `--primary`, `--accent`, `--shadow-dark`, `--shadow-light`, `--text-body`, `--text-muted`) plus reusable utility classes: `.neu-raised`, `.neu-inset`, `.btn-cta`, `.btn-ghost`, font-family rules. Tailwind config extends with these tokens so components reference `bg-surface`, `text-primary`, etc. — no raw hex in components.
+### Priority 3 — Instagram
+10. Ripgrep & replace all instagram URLs → `https://www.instagram.com/capacitiq_za` (Navbar, Footer, emails).
 
-### Shared shell
-- `<Navbar>` — floating neumorphic pill, logo + Solutions link, desktop nav (Home, Services, Templates, Portfolio, Blog, Careers, Company, Contact), Spotter link + Work With Us CTA. Mobile hamburger drawer with body-scroll lock + route-change reset. Active page lime dot indicator.
-- `<Footer>` — 5-column neumorphic card per spec (logo+tagline, contact, links, legal, socials with custom TikTok SVG), Free Consultation CTA, copyright line.
-- `<SEO>` component — sets per-page `<title>`, meta, OG, Twitter, canonical, JSON-LD via `react-helmet-async`.
+### Priority 4 — Blog
+11. Migration: `blog_posts` table + RLS (public read where status='published', admin all). Seed the long-form post.
+12. Rewrite `/blog` page — header, filter tabs, featured card + 3-col grid, empty state only after fetch resolves, fetch from DB.
+13. New route `/blog/:slug` (`BlogPost.tsx`) — full post render, parse short-line+blank-line as H2, DOMPurify, tags, CTA, back link, Article JSON-LD, SEO.
 
-### Routes (Phase 1)
-- `/` Home — hero with 3 feature cards, then every section described in spec lines 433-680ish (problem/solution, 5-pillar services teaser, why-Capacitiq, process, testimonials placeholder, final CTA).
-- `/services` — full 5-pillar breakdown.
-- `/company` — about / philosophy.
-- `/careers` — pulls open careers from DB; shows Sales Spotter card (open), Client Acquisition (closed). JobPosting JSON-LD on page. Apply form posts to `submissions` table (`kind = 'career'`).
-- `/contact` — contact form posts to `submissions` (`kind = 'contact'`).
-- `/privacy-policy`, `/terms-of-service`, `/template-policy`, `/refund-policy`, `/cookie-policy` — each uses the FALLBACK_CONTENT pattern from spec (hardcoded text renders immediately, DB content overrides if present).
+### Priority 5 — Admin panel
+**SKIPPED per user instruction ("ignore the admin panel for now").**
 
-### Database (Lovable Cloud migration)
-All tables from spec lines 91-170: `profiles`, `user_roles`, `templates`, `orders`, `submissions`, `careers`, `legal_pages`, `template_waitlist`. All RLS policies from lines 174-251. Column-level revoke on `templates.canva_link`. Seed two career rows.
+### Priority 6 — Invoice PDF
+14. `bun add pdfkit`. New `api/_invoice.js` builds A4 invoice per spec. `/api/charge.js` attaches `Capacitiq-Invoice-INV-XXXXXXXX.pdf` to customer delivery email via Resend `attachments`.
 
-## Phase 2 — Template shop + cart + checkout
+### Priority 7 — Reviews
+15. Migration: `reviews` table + RLS (public read where is_visible, admin all). No seed.
+16. **Home page** — add reviews section between FAQ and Ready-to-Start. Fetch is_visible=true, 6 limit, desktop 3-col, mobile horizontal scroll, Google G badge, lime stars, Read more toggle, avatar/initial, Leave Review + See All Reviews links, placeholder card when empty.
+17. **Footer** — add Google 4.9 badge above Get a Free Consultation.
 
-### Routes
-- `/templates` — grid of published templates from DB (excluding `canva_link`), category filters, price in ZAR (cents → rand), waitlist email form.
-- `/templates/cart` — cart contents from `localStorage` cart store, qty controls, subtotal, Proceed to Checkout.
-- `/templates/checkout` — 3-step flow (Information → Payment → Confirmation) exactly per spec:
-  - Step 1: customer info + billing form, sticky order summary sidebar.
-  - Step 2: Yoco SDK card tokenization → `POST /api/charge`. Card formatting helpers (4-digit groups, MM/YY mask). Error card with Try-again. Loading state disables button.
-  - Step 3: success card with order ID and email confirmation copy.
+### Priority 8 — Review request email
+18. Migration: `review_requests` table.
+19. `/api/charge.js` — after successful order insert, insert review_request with `send_after = now() + 3 days`.
+20. `/api/cron/send-reviews.js` — query unsent due rows, send Resend emails using spec HTML, mark sent.
+21. `vercel.json` — add `crons` entry.
 
-### Serverless function
-- `/api/charge.js` per spec lines 96-173: validates POST, calls Yoco charges API, on success inserts into `orders` table via Supabase service role, looks up each template's `canva_link`, emails the customer's link via Resend, sends internal notification to `hello@capacitiq.co.za`.
+### Priority 9 — SEO & misc
+22. Update SEO titles/descriptions on Blog, BlogPost, Portfolio, PortfolioDetail, SpotterPolicy, TemplateDetail.
+23. **Portfolio** — migration: `portfolio_items` table + RLS, seed the confidential ecosystem item.
+24. Rewrite `/portfolio` page — featured + 2-col grid, fetch DB, masonry feel, empty state.
+25. New `/portfolio/:portfolioId` page — hero, sections from JSONB, bottom CTA, back link, SEO.
+26. `public/llms.txt`, `public/robots.txt`, `public/sitemap.xml` (static fallback).
+27. `api/sitemap.js` — dynamic with blog slugs + portfolio ids.
+28. **Home page FAQPage JSON-LD** — add to head; **change** the "Do you create logos or video content?" answer to: "we do not create logos and video content as part of our graphic design pillar." Update the homepage FAQ accordion item to match.
+29. **Remove all "Web Presence"** references (filters, copy, FAQ JSON-LD list — keep only the 8 listed Qs; web presence wasn't in them anyway). Search codebase.
 
-### Cart state
-- `src/lib/cart.ts` — Zustand store backed by `localStorage`, exposes `addItem`, `removeItem`, `clear`, `total`.
+### Technical details
 
-## What's NOT in this build (Phase 3, later)
-Admin login, admin layout/sidebar, dashboard, templates manager + waitlist tab, orders viewer, submissions viewer, careers manager, legal pages editor, publish-triggered waitlist email blast.
+- Cart provider migration: replace `useCart` zustand hook with identical-interface React context so existing call sites in Cart/Checkout/Templates work unchanged.
+- DB enums: tighten submissions RLS by replacing INSERT policy with `WITH CHECK (false)`; all inserts go through service-role API.
+- Rate limit: simple `Map<ip, number[]>` in-memory in send-email handler; acceptable since Vercel serverless instances are short-lived but spec just says reject >5/60s.
+- PDF: pdfkit streamed to Buffer; attached as `{ filename, content: base64 }` per Resend API.
+- Cron: requires Vercel Pro for daily crons but spec says add it.
+- Push to GitHub: handled by Lovable automatically; no manual git commands.
 
-## Technical details
+### What I'm NOT doing
+- Admin panel (Priority 5) — per user instruction.
+- Any references to "Web Presence" — removed.
 
-- React Router DOM v6 with `<BrowserRouter>`. Routes declared in `src/App.tsx`.
-- Supabase client at `src/lib/supabase.ts` reads `import.meta.env.VITE_SUPABASE_URL` / `VITE_SUPABASE_PUBLISHABLE_KEY` (Lovable Cloud names — the spec's `VITE_SUPABASE_ANON_KEY` will be aliased to the same value).
-- Page background `#e8edf0` applied at `<body>` level so every route inherits.
-- Form submissions write to `submissions` table with `kind` discriminator (`contact`, `career`, `spotter`, etc.).
-- Lucide React for all icons. Custom inline SVG for TikTok.
-- Logo: Cloudinary URL used directly in `<img>` tags.
-
-## Open questions / risks
-
-1. **Preview-vs-production gap on checkout:** confirm you're fine that the Yoco flow can only be end-to-end tested after Vercel deploy (or I add a Cloud edge function mirror — extra work).
-2. **Spec mentions Paystack** in legal copy but checkout is Yoco-only. I'll keep the legal text references to both as written (it's accurate language for the policy even if Paystack isn't wired).
-3. **Spec's Supabase URL is ignored** since you chose Lovable Cloud — the env will point at Lovable's auto-provisioned project. When you deploy to Vercel, set the Vercel env vars to the Lovable Cloud values (visible in the Cloud panel).
-
-Reply "go" to start Phase 1, or tell me what to adjust.
+I'll execute everything top-to-bottom in one continuous run.

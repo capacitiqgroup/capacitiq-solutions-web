@@ -14,6 +14,54 @@ export type Database = {
   }
   public: {
     Tables: {
+      blog_posts: {
+        Row: {
+          author: string | null
+          body: string | null
+          category: string | null
+          created_at: string
+          excerpt: string | null
+          featured_image: string | null
+          id: string
+          publish_date: string | null
+          published_at: string | null
+          slug: string
+          status: string
+          tags: string[] | null
+          title: string
+        }
+        Insert: {
+          author?: string | null
+          body?: string | null
+          category?: string | null
+          created_at?: string
+          excerpt?: string | null
+          featured_image?: string | null
+          id?: string
+          publish_date?: string | null
+          published_at?: string | null
+          slug: string
+          status?: string
+          tags?: string[] | null
+          title: string
+        }
+        Update: {
+          author?: string | null
+          body?: string | null
+          category?: string | null
+          created_at?: string
+          excerpt?: string | null
+          featured_image?: string | null
+          id?: string
+          publish_date?: string | null
+          published_at?: string | null
+          slug?: string
+          status?: string
+          tags?: string[] | null
+          title?: string
+        }
+        Relationships: []
+      }
       careers: {
         Row: {
           compensation: string | null
@@ -122,6 +170,45 @@ export type Database = {
         }
         Relationships: []
       }
+      portfolio_items: {
+        Row: {
+          category: string | null
+          created_at: string
+          excerpt: string | null
+          hero_image: string | null
+          id: string
+          sections: Json | null
+          status: string
+          subtitle: string | null
+          tags: string[] | null
+          title: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          excerpt?: string | null
+          hero_image?: string | null
+          id?: string
+          sections?: Json | null
+          status?: string
+          subtitle?: string | null
+          tags?: string[] | null
+          title: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          excerpt?: string | null
+          hero_image?: string | null
+          id?: string
+          sections?: Json | null
+          status?: string
+          subtitle?: string | null
+          tags?: string[] | null
+          title?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -137,6 +224,75 @@ export type Database = {
           created_at?: string
           email?: string
           id?: string
+        }
+        Relationships: []
+      }
+      review_requests: {
+        Row: {
+          created_at: string
+          customer_email: string
+          customer_name: string
+          id: string
+          order_id: string | null
+          send_after: string
+          sent: boolean
+          template_name: string | null
+        }
+        Insert: {
+          created_at?: string
+          customer_email: string
+          customer_name: string
+          id?: string
+          order_id?: string | null
+          send_after?: string
+          sent?: boolean
+          template_name?: string | null
+        }
+        Update: {
+          created_at?: string
+          customer_email?: string
+          customer_name?: string
+          id?: string
+          order_id?: string | null
+          send_after?: string
+          sent?: boolean
+          template_name?: string | null
+        }
+        Relationships: []
+      }
+      reviews: {
+        Row: {
+          created_at: string
+          id: string
+          is_visible: boolean
+          rating: number
+          review_date: string
+          review_text: string
+          reviewer_name: string
+          reviewer_photo_url: string | null
+          source: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_visible?: boolean
+          rating: number
+          review_date?: string
+          review_text: string
+          reviewer_name: string
+          reviewer_photo_url?: string | null
+          source?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_visible?: boolean
+          rating?: number
+          review_date?: string
+          review_text?: string
+          reviewer_name?: string
+          reviewer_photo_url?: string | null
+          source?: string
         }
         Relationships: []
       }
