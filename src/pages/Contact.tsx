@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Mail, Phone, Clock, CheckCircle } from "lucide-react";
 import { Seo } from "@/lib/seo";
-import { supabase } from "@/integrations/supabase/client";
 import { CONTACT } from "@/lib/site";
 
 const SERVICES = ["Business Strategy and Operations", "Marketing and Growth", "Public Relations", "Virtual Assistance", "Graphic Design", "Not Sure", "Other"];
