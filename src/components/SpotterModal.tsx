@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Modal } from "./Modal";
 import { CheckCircle } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 
 export function SpotterModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [submitted, setSubmitted] = useState(false);
