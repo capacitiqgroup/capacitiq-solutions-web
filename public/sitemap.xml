@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://capacitiq.co.za/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://capacitiq.co.za/services</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://capacitiq.co.za/templates</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://capacitiq.co.za/blog</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://capacitiq.co.za/portfolio</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://capacitiq.co.za/careers</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://capacitiq.co.za/contact</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://capacitiq.co.za/company</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://capacitiq.co.za/privacy-policy</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://capacitiq.co.za/terms-of-service</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://capacitiq.co.za/template-policy</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://capacitiq.co.za/refund-policy</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://capacitiq.co.za/cookie-policy</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://capacitiq.co.za/spotter-policy</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://capacitiq.co.za/blog/capacitiq-building-business-infrastructure</loc><changefreq>yearly</changefreq><priority>0.7</priority></url>
+</urlset>

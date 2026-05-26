@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { Layout as LayoutIcon, CheckCircle } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Layout as LayoutIcon, CheckCircle, Check } from "lucide-react";
 import { Seo } from "@/lib/seo";
 import { supabase } from "@/integrations/supabase/client";
 import { useCart, formatZAR, type CartItem } from "@/lib/cart";
@@ -13,9 +14,10 @@ type T = {
 const CATEGORIES = ["All", "Social Media", "Presentations", "Business Docs", "Brand", "Email", "Events"];
 
 export default function Templates() {
-  const [items, setItems] = useState<T[]>([]);
+  const [items, setItems] = useState<T[] | null>(null);
   const [filter, setFilter] = useState("All");
   const cart = useCart();
+  const [justAdded, setJustAdded] = useState<string | null>(null);
 
   useEffect(() => {
     supabase
@@ -26,9 +28,15 @@ export default function Templates() {
   }, []);
 
   const filtered = useMemo(
-    () => (filter === "All" ? items : items.filter((t) => t.category === filter)),
+    () => (items === null ? [] : (filter === "All" ? items : items.filter((t) => t.category === filter))),
     [items, filter]
   );
+
+  function addToCart(t: T, priceCents: number) {
+    cart.addItem({ id: t.id, name: t.name, category: t.category, price: priceCents, preview_image: t.preview_image, launch_price: t.launch_price, standard_price: t.standard_price } as CartItem);
+    setJustAdded(t.id);
+    setTimeout(() => setJustAdded((cur) => (cur === t.id ? null : cur)), 1500);
+  }
 
   return (
     <>
@@ -61,7 +69,7 @@ export default function Templates() {
 
       <section className="px-4 sm:px-6 py-8">
         <div className="max-w-7xl mx-auto">
-          {filtered.length === 0 ? (
+          {items === null ? null : items.length === 0 ? (
             <div className="neu-raised rounded-3xl p-10 text-center max-w-xl mx-auto">
               <LayoutIcon size={48} className="mx-auto" color="#4a6670" />
               <h3 className="font-display font-bold text-xl mt-4">Templates coming soon.</h3>
@@ -73,12 +81,19 @@ export default function Templates() {
                 const inCart = cart.has(t.id);
                 const priceCents = t.launch_price ?? t.price;
                 const isFree = priceCents === 0;
+                const wasJustAdded = justAdded === t.id;
                 return (
                   <div key={t.id} className="neu-raised rounded-3xl p-5 flex flex-col">
-                    {t.preview_image && <img src={t.preview_image} alt={t.name} className="w-full aspect-square object-cover rounded-2xl" loading="lazy" />}
+                    {t.preview_image && (
+                      <Link to={`/templates/${t.id}`}>
+                        <img src={t.preview_image} alt={`${t.name} preview`} className="w-full aspect-square object-cover rounded-2xl" loading="lazy" />
+                      </Link>
+                    )}
                     <div className="mt-4 flex-1 flex flex-col">
                       <span className="text-xs font-display font-bold rounded-full px-2.5 py-1 self-start" style={{ backgroundColor: "#e6ff2b", color: "#0b4650" }}>{t.category}</span>
-                      <h3 className="font-display font-bold text-lg mt-2">{t.name}</h3>
+                      <Link to={`/templates/${t.id}`}>
+                        <h3 className="font-display font-bold text-lg mt-2 hover:underline">{t.name}</h3>
+                      </Link>
                       {isFree ? (
                         <span className="mt-1 inline-block self-start rounded-full px-3 py-1 text-xs font-display font-bold" style={{ backgroundColor: "#e6ff2b", color: "#0b4650" }}>FREE</span>
                       ) : (
@@ -91,12 +106,11 @@ export default function Templates() {
                       )}
                       <p className="text-sm text-muted mt-2 line-clamp-2">{t.description}</p>
                       <button
-                        className={inCart ? "btn-ghost mt-4 w-full" : "btn-cta mt-4 w-full"}
-                        onClick={() => inCart
-                          ? cart.removeItem(t.id)
-                          : cart.addItem({ id: t.id, name: t.name, category: t.category, price: priceCents, preview_image: t.preview_image } as CartItem)}
+                        className={inCart || wasJustAdded ? "btn-ghost mt-4 w-full inline-flex items-center justify-center gap-2" : "btn-cta mt-4 w-full"}
+                        disabled={inCart && !wasJustAdded}
+                        onClick={() => !inCart && addToCart(t, priceCents)}
                       >
-                        {inCart ? "Remove from Cart" : isFree ? "Get Free Template" : "Add to Cart"}
+                        {wasJustAdded ? (<><Check size={16} /> Added</>) : inCart ? (<><Check size={16} /> In Cart</>) : isFree ? "Get Free Template" : "Add to Cart"}
                       </button>
                     </div>
                   </div>

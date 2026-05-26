@@ -54,7 +54,9 @@ export function Footer() {
               <li><Link to="/company">About Us</Link></li>
               <li><Link to="/services">Services</Link></li>
               <li><Link to="/templates">Templates Shop</Link></li>
+              <li><Link to="/portfolio">Portfolio</Link></li>
               <li><Link to="/careers">Careers</Link></li>
+              <li><Link to="/blog">Blog</Link></li>
             </ul>
           </div>
           <div>
@@ -80,6 +82,10 @@ export function Footer() {
             </div>
           </div>
           <Link to="/contact" className="btn-cta">Get a Free Consultation</Link>
+          <a href="https://share.google/YeIYI2CfeNwysKbhx" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 text-xs text-[#4a6670]">
+            <span aria-hidden="true" className="inline-flex w-4 h-4 rounded-full items-center justify-center text-[9px] font-bold text-white" style={{ background: "conic-gradient(#4285F4 0 25%, #EA4335 25% 50%, #FBBC05 50% 75%, #34A853 75% 100%)" }}>G</span>
+            Review us on Google
+          </a>
           <p className="text-xs text-muted text-center">© 2026 Capacitiq Solutions (Pty) Ltd</p>
         </div>
       </div>
