@@ -47,6 +47,7 @@ export default function TemplateDetail() {
   const inCart = cart.has(t.id);
 
   function add() {
+    if (!t) return;
     cart.addItem({ id: t.id, name: t.name, category: t.category, price: priceCents, preview_image: t.preview_image, launch_price: t.launch_price, standard_price: t.standard_price } as CartItem);
     setJustAdded(true);
     setTimeout(() => setJustAdded(false), 1500);
