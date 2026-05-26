@@ -1,5 +1,24 @@
 {
   "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/sitemap.xml", "destination": "/api/sitemap" },
+    { "source": "/api/(.*)", "destination": "/api/$1" },
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
+  ],
+  "redirects": [
+    { "source": "/_public/blog", "destination": "/blog", "permanent": true },
+    { "source": "/_public/templates", "destination": "/templates", "permanent": true },
+    { "source": "/_public", "destination": "/", "permanent": true },
+    { "source": "/_public/", "destination": "/", "permanent": true },
+    { "source": "/_public/legal/:slug", "destination": "/:slug", "permanent": true },
+    { "source": "/template-store", "destination": "/templates", "permanent": true },
+    { "source": "/legal/cookie-policy", "destination": "/cookie-policy", "permanent": true },
+    { "source": "/legal/template-policy", "destination": "/template-policy", "permanent": true },
+    { "source": "/legal/refund-policy", "destination": "/refund-policy", "permanent": true },
+    { "source": "/blogs/tag/:tag", "destination": "/blog", "permanent": true },
+    { "source": "/blogs/:path*", "destination": "/blog", "permanent": true },
+    { "source": "/blogs", "destination": "/blog", "permanent": true }
+  ],
+  "crons": [
+    { "path": "/api/cron/send-reviews", "schedule": "0 9 * * *" }
   ]
 }
