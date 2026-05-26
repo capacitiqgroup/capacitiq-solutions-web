@@ -7,6 +7,8 @@ export type CartItem = {
   category: string;
   price: number; // cents
   preview_image: string | null;
+  standard_price?: number | null;
+  launch_price?: number | null;
 };
 
 export const formatZARDetailed = (cents: number) =>
@@ -19,6 +21,7 @@ type CartState = {
   clear: () => void;
   total: () => number;
   has: (id: string) => boolean;
+  totalCount: () => number;
 };
 
 export const useCart = create<CartState>()(
@@ -31,6 +34,7 @@ export const useCart = create<CartState>()(
       clear: () => set({ items: [] }),
       total: () => get().items.reduce((sum, i) => sum + i.price, 0),
       has: (id) => get().items.some((i) => i.id === id),
+      totalCount: () => get().items.length,
     }),
     { name: "capacitiq_cart" }
   )
