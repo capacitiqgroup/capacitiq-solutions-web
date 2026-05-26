@@ -42,8 +42,9 @@ export default async function handler(req, res) {
     else html = genericEmail(text || "");
 
     const { ok, data } = await sendResend({ to: recipients, subject, html });
-    return res.status(ok ? 200 : 500).json(data);
-  } catch (e) {
-    return res.status(500).json({ error: e?.message || "Server error" });
+    return res.status(ok ? 200 : 500).json(ok ? data : { error: "Email send failed" });
+  } catch (error) {
+    console.error("send-email error:", error);
+    return res.status(500).json({ error: "An error occurred. Please try again." });
   }
 }
