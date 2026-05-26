@@ -56,7 +56,8 @@ export default async function handler(req, res) {
     } catch {/* email failure should not block submission */}
 
     return res.status(200).json({ success: true });
-  } catch (e) {
-    return res.status(500).json({ error: e?.message || "Server error" });
+  } catch (error) {
+    console.error("Submit error:", error);
+    return res.status(500).json({ error: "An error occurred. Please try again." });
   }
 }
