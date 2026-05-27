@@ -90,23 +90,53 @@ export default function Checkout() {
       setProcessing(false);
       return;
     }
-    const yoco = new window.YocoSDK({ publicKey: pubKey });
+    // Safety net: never let the button spin forever.
+    const safetyTimer = window.setTimeout(() => {
+      setError("This is taking longer than expected. Please try again.");
+      setProcessing(false);
+    }, 35000);
+
+    let yoco: any;
+    try {
+      yoco = new window.YocoSDK({ publicKey: pubKey });
+    } catch (e: any) {
+      window.clearTimeout(safetyTimer);
+      setError("Payment system failed to initialise. " + (e?.message || ""));
+      setProcessing(false);
+      return;
+    }
+
     const [mm, yy] = card.expiry.split("/");
     const newOrderId = crypto.randomUUID();
-    yoco.createToken(
-      { name: card.name, number: card.number.replace(/\s/g, ""), expiryMonth: mm, expiryYear: yy, cvv: card.cvv },
-      async (result: any) => {
-        if (result.error) { setError(result.error.message); setProcessing(false); return; }
-        try {
-          const r = await chargeServer(result.id, newOrderId);
-          if (r.success) { setOrderId(newOrderId); cart.clear(); setStep(2); }
-          else { setError(r.error || "Payment failed."); setProcessing(false); }
-        } catch (e: any) {
-          setError("Payments only work on Vercel deployment. " + (e?.message || ""));
-          setProcessing(false);
+
+    try {
+      yoco.createToken(
+        { name: card.name, number: card.number.replace(/\s/g, ""), expiryMonth: mm, expiryYear: yy, cvv: card.cvv },
+        async (result: any) => {
+          console.log("Yoco createToken result", { hasError: !!result?.error, hasId: !!result?.id });
+          if (!result || result.error) {
+            window.clearTimeout(safetyTimer);
+            setError(result?.error?.message || "Card could not be tokenised. Please check details and try again.");
+            setProcessing(false);
+            return;
+          }
+          try {
+            const r = await chargeServer(result.id, newOrderId);
+            window.clearTimeout(safetyTimer);
+            if (r.success) { setOrderId(newOrderId); cart.clear(); setStep(2); }
+            else { setError(r.error || "Payment failed."); setProcessing(false); }
+          } catch (e: any) {
+            window.clearTimeout(safetyTimer);
+            setError("Payment could not be completed. " + (e?.message || ""));
+            setProcessing(false);
+          }
         }
-      }
-    );
+      );
+    } catch (e: any) {
+      window.clearTimeout(safetyTimer);
+      setError("Could not start payment. " + (e?.message || ""));
+      setProcessing(false);
+    }
   }
 
   return (
