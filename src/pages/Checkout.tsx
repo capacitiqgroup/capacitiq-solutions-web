@@ -37,15 +37,28 @@ export default function Checkout() {
   }
 
   async function chargeServer(token: string | null, newOrderId: string) {
-    const resp = await fetch("/api/charge", {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        token, currency: "ZAR", orderId: newOrderId,
-        customerEmail: info.email, customerName: info.fullName,
-        itemIds: cart.items.map((i) => i.id),
-      }),
-    });
-    return await resp.json();
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 30000);
+    try {
+      const resp = await fetch("/api/charge", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          token, currency: "ZAR", orderId: newOrderId,
+          customerEmail: info.email, customerName: info.fullName,
+          templateIds: cart.items.map((i) => i.id),
+          itemIds: cart.items.map((i) => i.id),
+        }),
+        signal: controller.signal,
+      });
+      clearTimeout(timeout);
+      return await resp.json();
+    } catch (e: any) {
+      clearTimeout(timeout);
+      if (e?.name === "AbortError") {
+        return { success: false, error: "The request timed out. Please check your connection and try again." };
+      }
+      throw e;
+    }
   }
 
   async function claimFree() {
@@ -67,7 +80,12 @@ export default function Checkout() {
     setError(null);
     setProcessing(true);
     const pubKey = (import.meta as any).env.VITE_YOCO_PUBLIC_KEY;
-    if (!window.YocoSDK || !pubKey) {
+    if (!window.YocoSDK) {
+      setError("Payment system is loading. Please wait a moment and try again.");
+      setProcessing(false);
+      return;
+    }
+    if (!pubKey) {
       setError("Payment SDK not configured. Set VITE_YOCO_PUBLIC_KEY and deploy to Vercel to enable live payments.");
       setProcessing(false);
       return;
