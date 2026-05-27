@@ -9,6 +9,7 @@ const isEmail = (s) => typeof s === "string" && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.tes
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
   try {
+    console.log("Charge request received", { templateIds: req.body?.templateIds?.length ?? req.body?.itemIds?.length, currency: req.body?.currency });
     // SECURITY: Never trust client-supplied amounts. Only template IDs accepted.
     const body = req.body || {};
     const templateIds = Array.isArray(body.templateIds) ? body.templateIds : body.itemIds;
