@@ -8,6 +8,7 @@ import Contact from "@/pages/Contact";
 import Templates from "@/pages/Templates";
 import Cart from "@/pages/Cart";
 import Checkout from "@/pages/Checkout";
+import ThankYou from "@/pages/ThankYou";
 import Blog from "@/pages/Blog";
 import Portfolio from "@/pages/Portfolio";
 import BlogDetail from "@/pages/BlogDetail";
@@ -30,6 +31,7 @@ export default function App() {
         <Route path="templates" element={<Templates />} />
         <Route path="templates/cart" element={<Cart />} />
         <Route path="templates/checkout" element={<Checkout />} />
+        <Route path="templates/thank-you" element={<ThankYou />} />
         <Route path="templates/:templateId" element={<TemplateDetail />} />
         <Route path="blog" element={<Blog />} />
         <Route path="blog/:slug" element={<BlogDetail />} />
