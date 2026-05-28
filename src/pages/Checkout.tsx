@@ -1,10 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { User, CreditCard, CheckCircle, Lock, AlertCircle } from "lucide-react";
+import { User, CreditCard, CheckCircle, Lock, AlertCircle, ExternalLink } from "lucide-react";
 import { Seo } from "@/lib/seo";
 import { useCart, formatZAR } from "@/lib/cart";
-
-declare global { interface Window { YocoSDK: any } }
 
 export default function Checkout() {
   const cart = useCart();
@@ -12,7 +10,6 @@ export default function Checkout() {
   const [step, setStep] = useState(0);
   const [orderId, setOrderId] = useState("");
   const [info, setInfo] = useState({ fullName: "", email: "", company: "", address: "", city: "", country: "South Africa", zip: "" });
-  const [card, setCard] = useState({ name: "", number: "", expiry: "", cvv: "" });
   const [error, setError] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
 
@@ -28,22 +25,14 @@ export default function Checkout() {
   const totalCents = cart.total();
   const isFree = totalCents === 0;
 
-  function formatCardNumber(v: string) {
-    return v.replace(/\D/g, "").slice(0, 16).replace(/(.{4})/g, "$1 ").trim();
-  }
-  function formatExpiry(v: string) {
-    const d = v.replace(/\D/g, "").slice(0, 4);
-    return d.length > 2 ? `${d.slice(0, 2)}/${d.slice(2)}` : d;
-  }
-
-  async function chargeServer(token: string | null, newOrderId: string) {
+  async function chargeServer(newOrderId: string) {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 30000);
     try {
       const resp = await fetch("/api/charge", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          token, currency: "ZAR", orderId: newOrderId,
+          token: null, currency: "ZAR", orderId: newOrderId,
           customerEmail: info.email, customerName: info.fullName,
           templateIds: cart.items.map((i) => i.id),
           itemIds: cart.items.map((i) => i.id),
@@ -67,7 +56,7 @@ export default function Checkout() {
     setProcessing(true);
     const newOrderId = crypto.randomUUID();
     try {
-      const r = await chargeServer(null, newOrderId);
+      const r = await chargeServer(newOrderId);
       if (r.success) { setOrderId(newOrderId); cart.clear(); setStep(2); }
       else { setError(r.error || "Could not complete."); setProcessing(false); }
     } catch (e: any) {
@@ -76,67 +65,27 @@ export default function Checkout() {
     }
   }
 
-  async function pay() {
+  function goToYoco() {
     setError(null);
     setProcessing(true);
-    const pubKey = (import.meta as any).env.VITE_YOCO_PUBLIC_KEY;
-    if (!window.YocoSDK) {
-      setError("Payment system is loading. Please wait a moment and try again.");
-      setProcessing(false);
-      return;
-    }
-    if (!pubKey) {
-      setError("Payment SDK not configured. Set VITE_YOCO_PUBLIC_KEY and deploy to Vercel to enable live payments.");
-      setProcessing(false);
-      return;
-    }
-    // Safety net: never let the button spin forever.
-    const safetyTimer = window.setTimeout(() => {
-      setError("This is taking longer than expected. Please try again.");
-      setProcessing(false);
-    }, 35000);
-
-    let yoco: any;
+    // Persist pending order context so the thank-you page can resolve it
     try {
-      yoco = new window.YocoSDK({ publicKey: pubKey });
-    } catch (e: any) {
-      window.clearTimeout(safetyTimer);
-      setError("Payment system failed to initialise. " + (e?.message || ""));
-      setProcessing(false);
-      return;
-    }
-
-    const [mm, yy] = card.expiry.split("/");
-    const newOrderId = crypto.randomUUID();
-
-    try {
-      yoco.createToken(
-        { name: card.name, number: card.number.replace(/\s/g, ""), expiryMonth: mm, expiryYear: yy, cvv: card.cvv },
-        async (result: any) => {
-          console.log("Yoco createToken result", { hasError: !!result?.error, hasId: !!result?.id });
-          if (!result || result.error) {
-            window.clearTimeout(safetyTimer);
-            setError(result?.error?.message || "Card could not be tokenised. Please check details and try again.");
-            setProcessing(false);
-            return;
-          }
-          try {
-            const r = await chargeServer(result.id, newOrderId);
-            window.clearTimeout(safetyTimer);
-            if (r.success) { setOrderId(newOrderId); cart.clear(); setStep(2); }
-            else { setError(r.error || "Payment failed."); setProcessing(false); }
-          } catch (e: any) {
-            window.clearTimeout(safetyTimer);
-            setError("Payment could not be completed. " + (e?.message || ""));
-            setProcessing(false);
-          }
-        }
+      sessionStorage.setItem(
+        "capacitiq_pending_payment",
+        JSON.stringify({
+          email: info.email,
+          name: info.fullName,
+          totalCents,
+          itemIds: cart.items.map((i) => i.id),
+          ts: Date.now(),
+        })
       );
-    } catch (e: any) {
-      window.clearTimeout(safetyTimer);
-      setError("Could not start payment. " + (e?.message || ""));
-      setProcessing(false);
-    }
+    } catch {/* ignore */}
+    const url = new URL("https://pay.yoco.com/capacitiq");
+    // Amount is locked server-side on Yoco's payment page; we still pass it as a prefill.
+    url.searchParams.set("amount", String(totalCents));
+    url.searchParams.set("reference", info.email);
+    window.location.href = url.toString();
   }
 
   return (
@@ -215,18 +164,20 @@ export default function Checkout() {
                     </>
                   ) : (
                     <>
-                      <h2 className="font-display font-bold text-xl">Capacitiq Pay</h2>
-                      <CInput label="Cardholder Name *" placeholder="Name on card" value={card.name} onChange={(v) => setCard({ ...card, name: v })} />
-                      <CInput label="Card Number *" placeholder="0000 0000 0000 0000" value={card.number} onChange={(v) => setCard({ ...card, number: formatCardNumber(v) })} />
-                      <div className="grid grid-cols-2 gap-3">
-                        <CInput label="Expiry Date *" placeholder="MM/YY" value={card.expiry} onChange={(v) => setCard({ ...card, expiry: formatExpiry(v) })} />
-                        <CInput label="CVV *" type="password" placeholder="CVV" value={card.cvv} onChange={(v) => setCard({ ...card, cvv: v.replace(/\D/g, "").slice(0, 4) })} />
+                      <h2 className="font-display font-bold text-xl">Secure Payment via Yoco</h2>
+                      <div className="neu-raised-sm rounded-2xl p-5 space-y-3">
+                        <p className="text-sm">You will be redirected to Yoco's secure payment page to complete your purchase.</p>
+                        <div className="text-sm">
+                          <div className="flex justify-between"><span className="text-muted">Amount</span><strong>{formatZAR(totalCents)}</strong></div>
+                          <div className="flex justify-between mt-1"><span className="text-muted">Reference</span><strong className="truncate ml-3">{info.email}</strong></div>
+                        </div>
+                        <p className="text-xs text-muted inline-flex items-center gap-1.5"><Lock size={14} /> The amount is locked. You cannot change it on the Yoco page.</p>
                       </div>
-                      <p className="text-xs text-muted inline-flex items-center gap-1.5"><Lock size={14} /> Secured by Yoco. Capacitiq does not store your card details.</p>
                       <button className="text-sm text-muted" onClick={() => setStep(0)}>← Back to Information</button>
-                      <button className="btn-cta w-full" style={{ height: 52 }} disabled={processing} onClick={pay}>
-                        {processing ? "Processing payment..." : `Pay ${formatZAR(totalCents)}`}
+                      <button className="btn-cta w-full inline-flex items-center justify-center gap-2" style={{ height: 52 }} disabled={processing} onClick={goToYoco}>
+                        {processing ? "Redirecting…" : <>Continue to Yoco · Pay {formatZAR(totalCents)} <ExternalLink size={16} /></>}
                       </button>
+                      <p className="text-xs text-muted text-center">After payment, you will be returned to our thank-you page and your template will be emailed to you.</p>
                     </>
                   )}
                   {error && (
