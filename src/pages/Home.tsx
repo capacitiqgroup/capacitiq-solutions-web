@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Compass, PenTool, Megaphone, TrendingUp, Briefcase, ChevronRight, ChevronDown, ArrowRight } from "lucide-react";
+import { Compass, PenTool, Megaphone, TrendingUp, Briefcase, ChevronRight, ChevronDown, ArrowRight, Star } from "lucide-react";
 import { Seo } from "@/lib/seo";
 import { SpotterModal } from "@/components/SpotterModal";
+import { supabase } from "@/integrations/supabase/client";
 
 const PILLARS = [
   { n: "01", icon: Compass, title: "Business Strategy and Operations", body: "Build the foundation. Create the systems. Lead with clarity. We help you move from instinct and improvisation to structured, documented, intentional operations.", link: "/services#business-strategy" },
@@ -27,6 +28,11 @@ export default function Home() {
   const [spotterOpen, setSpotterOpen] = useState(false);
   const [spotterKey, setSpotterKey] = useState(0);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
+  const [reviews, setReviews] = useState<any[]>([]);
+
+  useEffect(() => {
+    supabase.from("reviews").select("id,reviewer_name,reviewer_photo_url,rating,review_text,source").eq("is_visible", true).order("created_at", { ascending: false }).limit(6).then(({ data }) => setReviews(data || []));
+  }, []);
 
   return (
     <>
@@ -158,6 +164,31 @@ export default function Home() {
 
       {/* FAQ */}
       <section className="px-4 sm:px-6 py-16">
+        {reviews.length > 0 && (
+          <div className="max-w-7xl mx-auto mb-20">
+            <p className="text-xs uppercase tracking-widest text-muted">Client Reviews</p>
+            <h2 className="font-display font-bold text-3xl sm:text-4xl mt-2">What our clients are saying.</h2>
+            <div className="mt-10 grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {reviews.map((r) => (
+                <div key={r.id} className="neu-raised rounded-3xl p-6 flex flex-col">
+                  <div className="flex items-center gap-1 mb-3">
+                    {Array.from({ length: r.rating }).map((_, i) => (
+                      <Star key={i} size={16} fill="#e6ff2b" stroke="#e6ff2b" />
+                    ))}
+                  </div>
+                  <p className="text-sm text-[#0b4650] flex-1">"{r.review_text}"</p>
+                  <div className="flex items-center gap-3 mt-5 pt-5 border-t border-[#c5cdd4]">
+                    {r.reviewer_photo_url && <img src={r.reviewer_photo_url} alt={`${r.reviewer_name} profile photo`} className="w-10 h-10 rounded-full object-cover" />}
+                    <div>
+                      <p className="font-display font-bold text-sm text-[#0b4650]">{r.reviewer_name}</p>
+                      <p className="text-xs text-muted">{r.source}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
         <div className="max-w-3xl mx-auto">
           <p className="text-xs uppercase tracking-widest text-muted">FAQ</p>
           <h2 className="font-display font-bold text-3xl sm:text-4xl mt-2">Questions you may already have.</h2>

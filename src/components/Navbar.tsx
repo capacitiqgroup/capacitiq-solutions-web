@@ -4,9 +4,11 @@ import { Menu, X, ShoppingCart } from "lucide-react";
 import { NAV } from "@/lib/site";
 import { LogoMark } from "./LogoMark";
 import { useCart } from "@/lib/cart";
+import { CartDrawer } from "./CartDrawer";
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
+  const [cartOpen, setCartOpen] = useState(false);
   const location = useLocation();
   const count = useCart((s) => s.items.length);
 
@@ -44,21 +46,21 @@ export function Navbar() {
         </nav>
         <div className="hidden lg:flex items-center gap-4">
           <Link to="/careers" className="text-sm text-[#0b4650]">Spotter Program</Link>
-          <Link to="/templates/cart" aria-label="Cart" className="relative neu-raised-sm w-11 h-11 rounded-2xl inline-flex items-center justify-center">
+          <button type="button" onClick={() => setCartOpen(true)} aria-label="Open cart summary" className="relative neu-raised-sm w-11 h-11 rounded-2xl inline-flex items-center justify-center">
             <ShoppingCart size={20} color="#0b4650" />
             {count > 0 && (
               <span className="absolute -top-1 -right-1 min-w-[20px] h-5 px-1 rounded-full text-[11px] font-display font-bold inline-flex items-center justify-center" style={{ backgroundColor: "#e6ff2b", color: "#0b4650" }}>{count}</span>
             )}
-          </Link>
+          </button>
           <Link to="/contact" className="btn-cta !py-2.5 !px-5">Work With Us</Link>
         </div>
         <div className="lg:hidden flex items-center gap-2">
-          <Link to="/templates/cart" aria-label="Cart" className="relative neu-raised-sm w-11 h-11 rounded-2xl inline-flex items-center justify-center">
+          <button type="button" onClick={() => setCartOpen(true)} aria-label="Open cart summary" className="relative neu-raised-sm w-11 h-11 rounded-2xl inline-flex items-center justify-center">
             <ShoppingCart size={20} color="#0b4650" />
             {count > 0 && (
               <span className="absolute -top-1 -right-1 min-w-[20px] h-5 px-1 rounded-full text-[11px] font-display font-bold inline-flex items-center justify-center" style={{ backgroundColor: "#e6ff2b", color: "#0b4650" }}>{count}</span>
             )}
-          </Link>
+          </button>
           <button
             onClick={() => setOpen(true)}
             className="neu-raised-sm w-11 h-11 rounded-2xl inline-flex items-center justify-center"
@@ -110,6 +112,7 @@ export function Navbar() {
           </div>
         </div>
       )}
+      <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
     </header>
   );
 }
