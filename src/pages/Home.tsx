@@ -29,9 +29,15 @@ export default function Home() {
   const [spotterKey, setSpotterKey] = useState(0);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [reviews, setReviews] = useState<any[]>([]);
+  const [portfolio, setPortfolio] = useState<any[]>([]);
+  const [templates, setTemplates] = useState<any[]>([]);
+  const [posts, setPosts] = useState<any[]>([]);
 
   useEffect(() => {
-    supabase.from("reviews").select("id,reviewer_name,reviewer_photo_url,rating,review_text,source").eq("is_visible", true).order("created_at", { ascending: false }).limit(6).then(({ data }) => setReviews(data || []));
+    supabase.from("reviews").select("id,reviewer_name,reviewer_photo_url,rating,review_text,source").eq("is_visible", true).order("review_date", { ascending: false }).limit(6).then(({ data }) => setReviews(data || []));
+    supabase.from("portfolio_items").select("id,title,subtitle,category,excerpt,hero_image").eq("status", "published").order("created_at", { ascending: false }).limit(3).then(({ data }) => setPortfolio(data || []));
+    supabase.from("templates").select("id,name,category,launch_price,standard_price,preview_image").eq("status", "published").order("created_at", { ascending: false }).limit(3).then(({ data }) => setTemplates(data || []));
+    supabase.from("blog_posts").select("id,slug,title,excerpt,category,author,publish_date,featured_image").eq("status", "published").order("publish_date", { ascending: false }).limit(3).then(({ data }) => setPosts(data || []));
   }, []);
 
   return (
