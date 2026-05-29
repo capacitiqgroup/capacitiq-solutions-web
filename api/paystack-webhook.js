@@ -1,6 +1,6 @@
 import crypto from "crypto";
 import { createClient } from "@supabase/supabase-js";
-import { wrapEmail } from "./_email.js";
+import { wrapEmail, templateDeliveryEmail } from "./_email.js";
 
 export const config = { api: { bodyParser: false } };
 
@@ -8,28 +8,6 @@ async function readRaw(req) {
   const chunks = [];
   for await (const chunk of req) chunks.push(typeof chunk === "string" ? Buffer.from(chunk) : chunk);
   return Buffer.concat(chunks).toString("utf8");
-}
-
-function templateDeliveryEmail({ template, customerName }) {
-  const priceR = template.launch_price ? `R${(template.launch_price / 100).toFixed(2)}` : "FREE";
-  const thumb = template.preview_image
-    ? `<img src="${template.preview_image}" alt="${template.name}" style="width:100%;max-width:480px;aspect-ratio:16/9;object-fit:cover;border-radius:12px;display:block;margin:0 auto 16px;" />`
-    : "";
-  return wrapEmail(`
-    <h2 style="font-family:Arial,sans-serif;color:#0b4650;margin:0 0 8px;">Your Capacitiq Template is Ready</h2>
-    <p style="font-family:Arial,sans-serif;color:#4a6670;">Hi ${customerName || "there"}, thank you for your purchase.</p>
-    ${thumb}
-    <table width="100%" cellpadding="8" cellspacing="0" style="font-family:Arial,sans-serif;color:#0b4650;border-collapse:collapse;margin:16px 0;">
-      <tr><td><strong>Template</strong></td><td>${template.name}</td></tr>
-      <tr><td><strong>Category</strong></td><td>${template.category || ""}</td></tr>
-      <tr><td><strong>Price</strong></td><td>${priceR}</td></tr>
-      <tr><td><strong>Shipping</strong></td><td>FREE (Digital)</td></tr>
-    </table>
-    <p style="text-align:center;margin:24px 0;">
-      <a href="${template.canva_link}" style="background:#e6ff2b;color:#0b4650;font-family:Arial,sans-serif;font-weight:bold;padding:14px 28px;border-radius:12px;text-decoration:none;display:inline-block;">Access Your Template</a>
-    </p>
-    <p style="font-family:Arial,sans-serif;color:#4a6670;font-size:13px;">A Canva account is required. By using this template you agree to our Template Licence Policy: it is for your own personal and business use, and you may not resell or redistribute the original template file.</p>
-  `);
 }
 
 async function sendResendDirect({ to, subject, html }) {
