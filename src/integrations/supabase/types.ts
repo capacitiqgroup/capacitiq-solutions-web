@@ -110,6 +110,42 @@ export type Database = {
         }
         Relationships: []
       }
+      checkout_sessions: {
+        Row: {
+          amount_in_cents: number
+          created_at: string
+          customer_email: string
+          customer_name: string | null
+          expires_at: string
+          id: string
+          session_token: string
+          status: string
+          template_ids: Json
+        }
+        Insert: {
+          amount_in_cents: number
+          created_at?: string
+          customer_email: string
+          customer_name?: string | null
+          expires_at?: string
+          id?: string
+          session_token: string
+          status?: string
+          template_ids: Json
+        }
+        Update: {
+          amount_in_cents?: number
+          created_at?: string
+          customer_email?: string
+          customer_name?: string | null
+          expires_at?: string
+          id?: string
+          session_token?: string
+          status?: string
+          template_ids?: Json
+        }
+        Relationships: []
+      }
       legal_pages: {
         Row: {
           content: string
