@@ -142,3 +142,19 @@
   .font-display { font-family: var(--font-display); }
   .text-muted { color: var(--color-text-muted); }
 }
+@layer utilities {
+  .image-container {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: 12px;
+    background-color: #e8edf0;
+  }
+  .image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .image-container.contain img { object-fit: contain; }
+}
