@@ -83,7 +83,7 @@ export default function Checkout() {
     } catch {/* ignore */}
     const url = new URL("https://pay.yoco.com/capacitiq");
     // Amount is locked server-side on Yoco's payment page; we still pass it as a prefill.
-    url.searchParams.set("amount", (totalCents / 100).toFixed(2));
+    url.searchParams.set("amount", String(totalCents));
     s.set("reference", info.email);
     window.location.href = url.toString();
   }
