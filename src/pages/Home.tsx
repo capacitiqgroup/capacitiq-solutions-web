@@ -168,8 +168,102 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Portfolio preview */}
+      {portfolio.length > 0 && (
+        <section className="px-4 sm:px-6 py-16">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex items-end justify-between flex-wrap gap-4 mb-8">
+              <div>
+                <p className="text-xs uppercase tracking-widest text-muted">Portfolio</p>
+                <h2 className="font-display font-bold text-3xl sm:text-4xl mt-2" style={{ color: "#0b4650" }}>Selected work.</h2>
+              </div>
+              <Link to="/portfolio" className="btn-ghost">View all</Link>
+            </div>
+            <div className="grid md:grid-cols-3 gap-6">
+              {portfolio.map((p) => (
+                <Link key={p.id} to={`/portfolio/${p.id}`} className="neu-raised rounded-3xl overflow-hidden group">
+                  <div className="aspect-video bg-[#cfe0e3] overflow-hidden">
+                    {p.hero_image && <img src={p.hero_image} alt={p.title} className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform" />}
+                  </div>
+                  <div className="p-6">
+                    {p.category && <span className="text-xs font-display font-bold rounded-full px-2.5 py-1" style={{ backgroundColor: "#e6ff2b", color: "#0b4650" }}>{p.category}</span>}
+                    <h3 className="font-display font-bold text-lg mt-3" style={{ color: "#0b4650" }}>{p.title}</h3>
+                    {p.excerpt && <p className="mt-2 text-sm line-clamp-2" style={{ color: "#4a6670" }}>{p.excerpt}</p>}
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Templates preview */}
+      {templates.length > 0 && (
+        <section className="px-4 sm:px-6 py-16">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex items-end justify-between flex-wrap gap-4 mb-8">
+              <div>
+                <p className="text-xs uppercase tracking-widest text-muted">Template Shop</p>
+                <h2 className="font-display font-bold text-3xl sm:text-4xl mt-2" style={{ color: "#0b4650" }}>Ready-to-brand Canva templates.</h2>
+              </div>
+              <Link to="/templates" className="btn-ghost">Browse all</Link>
+            </div>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {templates.map((t) => {
+                const price = t.launch_price ?? 0;
+                const orig = t.standard_price;
+                return (
+                  <Link key={t.id} to={`/templates/${t.id}`} className="neu-raised rounded-3xl p-5 flex flex-col">
+                    {t.preview_image && <img src={t.preview_image} alt={`${t.name} preview`} className="w-full aspect-square object-cover rounded-2xl" loading="lazy" />}
+                    <div className="mt-4">
+                      <span className="text-xs font-display font-bold rounded-full px-2.5 py-1" style={{ backgroundColor: "#e6ff2b", color: "#0b4650" }}>{t.category}</span>
+                      <h3 className="font-display font-bold text-lg mt-2" style={{ color: "#0b4650" }}>{t.name}</h3>
+                      <div className="mt-1 flex items-baseline gap-2">
+                        <span className="font-display font-bold" style={{ color: "#0b4650" }}>R{Math.round(price / 100).toLocaleString("en-ZA")}</span>
+                        {orig && orig > price && <span className="text-sm line-through" style={{ color: "#4a6670" }}>R{Math.round(orig / 100).toLocaleString("en-ZA")}</span>}
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Blog preview */}
+      {posts.length > 0 && (
+        <section className="px-4 sm:px-6 py-16">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex items-end justify-between flex-wrap gap-4 mb-8">
+              <div>
+                <p className="text-xs uppercase tracking-widest text-muted">From the Blog</p>
+                <h2 className="font-display font-bold text-3xl sm:text-4xl mt-2" style={{ color: "#0b4650" }}>Practical insights.</h2>
+              </div>
+              <Link to="/blog" className="btn-ghost">Read all</Link>
+            </div>
+            <div className="grid md:grid-cols-3 gap-6">
+              {posts.map((p) => (
+                <Link key={p.id} to={`/blog/${p.slug}`} className="neu-raised rounded-3xl overflow-hidden group">
+                  <div className="aspect-video bg-[#cfe0e3] overflow-hidden">
+                    {p.featured_image && <img src={p.featured_image} alt={p.title} className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform" />}
+                  </div>
+                  <div className="p-5">
+                    {p.category && <span className="text-xs font-display font-bold rounded-full px-2.5 py-1" style={{ backgroundColor: "#e6ff2b", color: "#0b4650" }}>{p.category}</span>}
+                    <h3 className="font-display font-bold text-lg mt-3 line-clamp-2" style={{ color: "#0b4650" }}>{p.title}</h3>
+                    {p.excerpt && <p className="mt-2 text-sm line-clamp-2" style={{ color: "#4a6670" }}>{p.excerpt}</p>}
+                    <p className="text-xs text-muted mt-3">{p.author} · {p.publish_date}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* FAQ */}
       <section className="px-4 sm:px-6 py-16">
+
         {reviews.length > 0 && (
           <div className="max-w-7xl mx-auto mb-20">
             <p className="text-xs uppercase tracking-widest text-muted">Client Reviews</p>
