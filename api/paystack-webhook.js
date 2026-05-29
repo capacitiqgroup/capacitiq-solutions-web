@@ -103,7 +103,15 @@ export default async function handler(req, res) {
     await sendResendDirect({
       to: session.customer_email,
       subject: `Your Capacitiq Template — ${template.name}`,
-      html: templateDeliveryEmail({ template, customerName: session.customer_name }),
+      html: templateDeliveryEmail({
+        customerName: session.customer_name,
+        customerEmail: session.customer_email,
+        orderId: reference,
+        template,
+        priceCents: template.launch_price,
+        isFree: false,
+        paymentMethod: "Paystack",
+      }),
     });
   }
 
