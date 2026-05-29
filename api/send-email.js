@@ -1,7 +1,7 @@
 import { sendResend, contactFormEmail, spotterReferralEmail, genericEmail } from "./_email.js";
 
 const STATIC_ALLOWLIST = new Set(["hello@capacitiq.co.za", "careers@capacitiq.co.za"]);
-const ALLOWED_TYPES = new Set(["contact", "spotter", "pricing-guide", "waitlist", "career-application"]);
+const ALLOWED_TYPES = new Set(["contact", "spotter", "pricing-guide", "waitlist", "career-application", "template_order_request"]);
 const isEmail = (s) => typeof s === "string" && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
 
 const RATE_WINDOW_MS = 60_000;
