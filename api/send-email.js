@@ -1,4 +1,4 @@
-import { sendResend, contactFormEmail, spotterReferralEmail, genericEmail } from "./_email.js";
+import { sendResend, contactFormEmail, spotterReferralEmail, genericEmail, templateOrderRequestEmail } from "./_email.js";
 
 const STATIC_ALLOWLIST = new Set(["hello@capacitiq.co.za", "careers@capacitiq.co.za"]);
 const ALLOWED_TYPES = new Set(["contact", "spotter", "pricing-guide", "waitlist", "career-application", "template_order_request"]);
@@ -39,6 +39,7 @@ export default async function handler(req, res) {
     let html;
     if (type === "contact") html = contactFormEmail(payload || {});
     else if (type === "spotter") html = spotterReferralEmail(payload || {});
+    else if (type === "template_order_request") html = templateOrderRequestEmail(payload || {});
     else html = genericEmail(text || "");
 
     const { ok, data } = await sendResend({ to: recipients, subject, html });

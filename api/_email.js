@@ -176,6 +176,29 @@ export function genericEmail(textBody) {
   return wrapEmail(body);
 }
 
+export function templateOrderRequestEmail(p) {
+  const c = p?.customer || {};
+  const tmpls = Array.isArray(p?.templates) ? p.templates : [];
+  const itemsHtml = tmpls.map((t) => `<li style="margin:4px 0;color:#0b4650;font-family:Arial,sans-serif;font-size:13px;">${esc(t.name)}${typeof t.price === "number" ? ` — R${Math.round(t.price / 100).toLocaleString("en-ZA")}` : ""}</li>`).join("");
+  const body = `
+<h2 style="color:#0b4650;font-family:Arial,sans-serif;font-size:20px;margin:0 0 8px;">New Template Order Request (WhatsApp)</h2>
+<p style="color:#4a6670;font-family:Arial,sans-serif;font-size:14px;margin:0 0 24px;">A customer has requested a payment link via WhatsApp.</p>
+<div style="background:#f5f7f8;border-radius:12px;padding:20px;"><table width="100%" cellpadding="0" cellspacing="0">
+${row("Name", c.fullName)}
+${row("Email", c.email)}
+${row("Phone", c.phone)}
+${row("Company", c.company)}
+${row("Billing Address", [c.address, c.city, c.zip, c.country].filter(Boolean).join(", "))}
+${row("Order Total", p?.total)}
+${row("Submitted", new Date().toLocaleString("en-ZA"))}
+</table>
+<p style="margin:16px 0 4px;color:#0b4650;font-family:Arial,sans-serif;font-size:13px;font-weight:bold;">Templates Requested</p>
+<ul style="margin:0;padding-left:20px;">${itemsHtml}</ul>
+</div>`;
+  return wrapEmail(body);
+}
+
+
 export const FROM = "Capacitiq <noreply@capacitiq.co.za>";
 
 export async function sendResend({ to, subject, html, attachments }) {
