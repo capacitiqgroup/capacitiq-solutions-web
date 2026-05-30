@@ -23,7 +23,7 @@ export default function Templates() {
   useEffect(() => {
     supabase
       .from("templates")
-      .select("id,name,category,price,launch_price,standard_price,description,preview_image,status")
+      .select("id,name,category,price,launch_price,standard_price,description,preview_image,status,payment_link")
       .eq("status", "published")
       .then(({ data }) => setItems((data as any) || []));
   }, []);
