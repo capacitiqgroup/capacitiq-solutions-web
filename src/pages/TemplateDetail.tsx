@@ -9,6 +9,7 @@ type T = {
   id: string; name: string; category: string;
   price: number; launch_price: number | null; standard_price: number | null;
   description: string | null; preview_image: string | null; status: string;
+  payment_link: string | null;
 };
 
 export default function TemplateDetail() {
