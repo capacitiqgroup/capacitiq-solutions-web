@@ -109,8 +109,8 @@ export function Header({ title, onAdd }: { title: string; onAdd: () => void }) {
 export function Table({ children }: { children: React.ReactNode }) {
   return <div className="neu-raised rounded-3xl p-2 overflow-x-auto"><table className="w-full text-sm">{children}</table></div>;
 }
-export function Th({ children }: { children: React.ReactNode }) { return <th className="text-left p-3 font-display text-xs uppercase" style={{ color: "#4a6670" }}>{children}</th>; }
-export function Td({ children }: { children: React.ReactNode }) { return <td className="p-3" style={{ color: "#0b4650" }}>{children}</td>; }
+export function Th({ children }: { children?: React.ReactNode }) { return <th className="text-left p-3 font-display text-xs uppercase" style={{ color: "#4a6670" }}>{children}</th>; }
+export function Td({ children }: { children?: React.ReactNode }) { return <td className="p-3" style={{ color: "#0b4650" }}>{children}</td>; }
 export function Pill({ text }: { text: string }) {
   const lime = text === "published" || text === "open";
   return <span className="rounded-full px-2.5 py-1 text-xs font-display font-bold" style={{ backgroundColor: lime ? "#e6ff2b" : "#dde3e8", color: "#0b4650" }}>{text}</span>;
