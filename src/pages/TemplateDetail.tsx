@@ -23,7 +23,7 @@ export default function TemplateDetail() {
     if (!templateId) return;
     supabase
       .from("templates")
-      .select("id,name,category,price,launch_price,standard_price,description,preview_image,status")
+      .select("id,name,category,price,launch_price,standard_price,description,preview_image,status,payment_link")
       .eq("id", templateId)
       .eq("status", "published")
       .maybeSingle()
