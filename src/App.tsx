@@ -8,6 +8,7 @@ import Contact from "@/pages/Contact";
 import Templates from "@/pages/Templates";
 import Cart from "@/pages/Cart";
 import Checkout from "@/pages/Checkout";
+import ThankYou from "@/pages/ThankYou";
 
 import Blog from "@/pages/Blog";
 import Portfolio from "@/pages/Portfolio";
@@ -19,9 +20,25 @@ import LegalPage from "@/pages/Legal";
 import NotFound from "@/pages/NotFound";
 import { LEGAL_PAGES } from "@/pages/legal-content";
 
+import AdminLogin from "@/pages/admin/AdminLogin";
+import AdminLayout from "@/pages/admin/AdminLayout";
+import AdminBlog from "@/pages/admin/AdminBlog";
+import AdminTemplates from "@/pages/admin/AdminTemplates";
+import AdminPortfolio from "@/pages/admin/AdminPortfolio";
+import AdminReviews from "@/pages/admin/AdminReviews";
+
 export default function App() {
   return (
     <Routes>
+      <Route path="admin/login" element={<AdminLogin />} />
+      <Route path="admin" element={<AdminLayout />}>
+        <Route index element={<AdminTemplates />} />
+        <Route path="blog" element={<AdminBlog />} />
+        <Route path="templates" element={<AdminTemplates />} />
+        <Route path="portfolio" element={<AdminPortfolio />} />
+        <Route path="reviews" element={<AdminReviews />} />
+      </Route>
+
       <Route element={<Layout />}>
         <Route index element={<Home />} />
         <Route path="services" element={<Services />} />
@@ -31,7 +48,8 @@ export default function App() {
         <Route path="templates" element={<Templates />} />
         <Route path="templates/cart" element={<Cart />} />
         <Route path="templates/checkout" element={<Checkout />} />
-        
+        <Route path="templates/thank-you" element={<ThankYou />} />
+
         <Route path="templates/:templateId" element={<TemplateDetail />} />
         <Route path="blog" element={<Blog />} />
         <Route path="blog/:slug" element={<BlogDetail />} />

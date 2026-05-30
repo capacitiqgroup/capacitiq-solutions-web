@@ -9,6 +9,7 @@ type T = {
   id: string; name: string; category: string;
   price: number; launch_price: number | null; standard_price: number | null;
   description: string | null; preview_image: string | null; status: string;
+  payment_link: string | null;
 };
 
 export default function TemplateDetail() {
@@ -22,7 +23,7 @@ export default function TemplateDetail() {
     if (!templateId) return;
     supabase
       .from("templates")
-      .select("id,name,category,price,launch_price,standard_price,description,preview_image,status")
+      .select("id,name,category,price,launch_price,standard_price,description,preview_image,status,payment_link")
       .eq("id", templateId)
       .eq("status", "published")
       .maybeSingle()
@@ -90,13 +91,18 @@ export default function TemplateDetail() {
               <div className="mt-6 space-y-3 text-[15px]" style={{ color: "#4a6670", lineHeight: 1.7 }}>
                 {(t.description || "").split(/\n\n+/).map((p, i) => <p key={i}>{p}</p>)}
               </div>
-              <button
-                className={inCart || justAdded ? "btn-ghost mt-6 w-full inline-flex items-center justify-center gap-2" : "btn-cta mt-6 w-full"}
-                disabled={inCart && !justAdded}
-                onClick={() => !inCart && add()}
-              >
-                {justAdded ? (<><Check size={16} /> Added</>) : inCart ? (<><Check size={16} /> In Cart</>) : isFree ? "Get For Free" : "Add to Cart"}
-              </button>
+              <div className="mt-6 space-y-2">
+                {!isFree && t.payment_link && (
+                  <a href={t.payment_link} target="_blank" rel="noopener noreferrer" className="btn-cta w-full text-center">Buy Now</a>
+                )}
+                <button
+                  className={inCart || justAdded ? "btn-ghost w-full inline-flex items-center justify-center gap-2" : (isFree ? "btn-cta w-full" : "btn-ghost w-full")}
+                  disabled={inCart && !justAdded}
+                  onClick={() => !inCart && add()}
+                >
+                  {justAdded ? (<><Check size={16} /> Added</>) : inCart ? (<><Check size={16} /> In Cart</>) : isFree ? "Get For Free" : "Add to Cart"}
+                </button>
+              </div>
               <p className="text-xs mt-3" style={{ color: "#4a6670" }}>A Canva account is required to access and edit this template. All sales are final once a link has been delivered.</p>
             </div>
           </div>
