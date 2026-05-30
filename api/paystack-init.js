@@ -27,7 +27,9 @@ export default async function handler(req, res) {
 
   // launch_price stored in cents (ZAR sub-unit), Paystack ZAR amount is also in cents
   const amountInCents = templates.reduce((sum, t) => sum + (t.launch_price ?? t.price ?? 0), 0);
-  if (amountInCents <= 0) return res.status(400).json({ error: "Invalid amount" });
+  console.log('Templates fetched:', JSON.stringify(templates));
+console.log('Amount calculated:', amountInCents);
+if (amountInCents <= 0) return res.status(400).json({ error: "Invalid amount — check launch_price in database", templates: templates.map(t => ({id: t.id, name: t.name, launch_price: t.launch_price, price: t.price})) });
 
   const reference = `CAP-${crypto.randomUUID()}`;
 
