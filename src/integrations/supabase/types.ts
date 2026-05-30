@@ -413,6 +413,7 @@ export type Database = {
           id: string
           launch_price: number | null
           name: string
+          payment_link: string | null
           preview_image: string | null
           price: number
           standard_price: number | null
@@ -426,6 +427,7 @@ export type Database = {
           id?: string
           launch_price?: number | null
           name: string
+          payment_link?: string | null
           preview_image?: string | null
           price: number
           standard_price?: number | null
@@ -439,6 +441,7 @@ export type Database = {
           id?: string
           launch_price?: number | null
           name?: string
+          payment_link?: string | null
           preview_image?: string | null
           price?: number
           standard_price?: number | null
