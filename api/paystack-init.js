@@ -58,8 +58,11 @@ export default async function handler(req, res) {
   if (!paystackRes.ok) {
     const err = await paystackRes.text();
     console.error("Paystack init failed:", paystackRes.status, err);
-    return res.status(500).json({ error: "Payment system error" });
-  }
+    return res.status(400).json({ 
+  error: 'Payment system error', 
+  detail: errorBody 
+});
+  
 
   const paystackData = await paystackRes.json();
 
