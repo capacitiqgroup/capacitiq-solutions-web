@@ -106,13 +106,18 @@ export default function Templates() {
                         </div>
                       )}
                       <p className="text-sm text-muted mt-2 line-clamp-2">{t.description}</p>
-                      <button
-                        className={inCart || wasJustAdded ? "btn-ghost mt-4 w-full inline-flex items-center justify-center gap-2" : "btn-cta mt-4 w-full"}
-                        disabled={inCart && !wasJustAdded}
-                        onClick={() => !inCart && addToCart(t, priceCents)}
-                      >
-                        {wasJustAdded ? (<><Check size={16} /> Added</>) : inCart ? (<><Check size={16} /> In Cart</>) : isFree ? "Get Free Template" : "Add to Cart"}
-                      </button>
+                      <div className="mt-4 space-y-2">
+                        {!isFree && t.payment_link && (
+                          <a href={t.payment_link} target="_blank" rel="noopener noreferrer" className="btn-cta w-full text-center">Buy Now</a>
+                        )}
+                        <button
+                          className={inCart || wasJustAdded ? "btn-ghost w-full inline-flex items-center justify-center gap-2" : (isFree ? "btn-cta w-full" : "btn-ghost w-full")}
+                          disabled={inCart && !wasJustAdded}
+                          onClick={() => !inCart && addToCart(t, priceCents)}
+                        >
+                          {wasJustAdded ? (<><Check size={16} /> Added</>) : inCart ? (<><Check size={16} /> In Cart</>) : isFree ? "Get Free Template" : "Add to Cart"}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 );
