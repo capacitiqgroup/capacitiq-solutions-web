@@ -4,16 +4,28 @@ import crypto from "crypto";
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).end();
 
-  const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+  const supabase = createClient(
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_SERVICE_ROLE_KEY
+  );
+
   const { templateIds, customerEmail, customerName } = req.body || {};
+
+  console.log("paystack-init called", { customerEmail, templateIds });
 
   if (!customerEmail || !Array.isArray(templateIds) || templateIds.length === 0) {
     return res.status(400).json({ error: "Missing required fields" });
   }
+
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(customerEmail)) return res.status(400).json({ error: "Invalid email" });
+  if (!emailRegex.test(customerEmail)) {
+    return res.status(400).json({ error: "Invalid email" });
+  }
+
   const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-  if (!templateIds.every((id) => uuidRegex.test(id))) return res.status(400).json({ error: "Invalid template IDs" });
+  if (!templateIds.every((id) => uuidRegex.test(id))) {
+    return res.status(400).json({ error: "Invalid template IDs" });
+  }
 
   const { data: templates, error } = await supabase
     .from("templates")
@@ -21,50 +33,75 @@ export default async function handler(req, res) {
     .in("id", templateIds)
     .eq("status", "published");
 
+  console.log("templates fetched", { templates, error });
+
   if (error || !templates || templates.length !== templateIds.length) {
-    return res.status(400).json({ error: "Templates unavailable" });
+    return res.status(400).json({ error: "Templates unavailable", detail: error?.message });
   }
 
-  // launch_price stored in cents (ZAR sub-unit), Paystack ZAR amount is also in cents
-  const amountInCents = templates.reduce((sum, t) => sum + (t.launch_price ?? t.price ?? 0), 0);
-  console.log('Templates fetched:', JSON.stringify(templates));
-console.log('Amount calculated:', amountInCents);
-if (amountInCents <= 0) return res.status(400).json({ error: "Invalid amount — check launch_price in database", templates: templates.map(t => ({id: t.id, name: t.name, launch_price: t.launch_price, price: t.price})) });
+  const amountInCents = templates.reduce(
+    (sum, t) => sum + (t.launch_price ?? t.price ?? 0),
+    0
+  );
+
+  console.log("amount calculated", amountInCents);
+
+  if (amountInCents <= 0) {
+    return res.status(400).json({
+      error: "Invalid amount",
+      templates: templates.map((t) => ({
+        id: t.id,
+        name: t.name,
+        launch_price: t.launch_price,
+        price: t.price,
+      })),
+    });
+  }
 
   const reference = `CAP-${crypto.randomUUID()}`;
 
-  const paystackRes = await fetch("https://api.paystack.co/transaction/initialize", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
-      "Content-Type": "application/json",
+  const paystackPayload = {
+    email: customerEmail,
+    amount: amountInCents,
+    currency: "ZAR",
+    reference,
+    channels: ["card", "eft"],
+    metadata: {
+      customer_name: customerName,
+      template_ids: templateIds.join(","),
+      custom_fields: templates.map((t) => ({
+        display_name: "Template",
+        variable_name: "template_name",
+        value: t.name,
+      })),
     },
-    body: JSON.stringify({
-      email: customerEmail,
-      amount: amountInCents,
-      currency: "ZAR",
-      reference,
-      channels: ["card", "eft"],
-      metadata: {
-        customer_name: customerName,
-        template_ids: templateIds.join(","),
-        custom_fields: templates.map((t) => ({
-          display_name: "Template",
-          variable_name: "template_name",
-          value: t.name,
-        })),
+  };
+
+  console.log("calling paystack with", JSON.stringify(paystackPayload));
+
+  const paystackRes = await fetch(
+    "https://api.paystack.co/transaction/initialize",
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
+        "Content-Type": "application/json",
       },
-    }),
-  });
+      body: JSON.stringify(paystackPayload),
+    }
+  );
+
+  const paystackBody = await paystackRes.text();
+  console.log("paystack response", paystackRes.status, paystackBody);
 
   if (!paystackRes.ok) {
-    const err = await paystackRes.text();
-    console.error("Paystack init failed:", paystackRes.status, err);
-    return res.status(500).json({ error: 'Payment system error' });
+    return res.status(500).json({
+      error: "Payment system error. Please try again or contact us on WhatsApp.",
+      detail: paystackBody,
+    });
   }
-  
 
-  const paystackData = await paystackRes.json();
+  const paystackData = JSON.parse(paystackBody);
 
   await supabase.from("checkout_sessions").insert({
     session_token: reference,
