@@ -87,6 +87,12 @@ export function Footer() {
             Review us on Google
           </a>
           <p className="text-xs text-muted text-center">© 2026 Capacitiq Solutions (Pty) Ltd</p>
+          <button
+            onClick={() => { localStorage.removeItem("capacitiq_cookie_consent"); window.location.reload(); }}
+            className="text-xs underline text-[#4a6670]"
+          >
+            Cookie Settings
+          </button>
         </div>
       </div>
     </footer>
