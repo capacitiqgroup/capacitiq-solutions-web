@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { Navigate, NavLink, Outlet, useNavigate } from "react-router-dom";
-import { FileText, Layout as LayoutIcon, Briefcase, Star, LogOut, Menu, X } from "lucide-react";
+import { FileText, Layout as LayoutIcon, Briefcase, Star, LogOut, Menu, X, ShoppingBag } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 const NAV = [
   { to: "/admin/blog", label: "Blog Posts", icon: FileText },
   { to: "/admin/templates", label: "Templates", icon: LayoutIcon },
   { to: "/admin/portfolio", label: "Portfolio", icon: Briefcase },
+  { to: "/admin/orders", label: "Orders", icon: ShoppingBag },
   { to: "/admin/reviews", label: "Reviews", icon: Star },
 ];
 
