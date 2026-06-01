@@ -10,6 +10,7 @@ type T = {
   price: number; launch_price: number | null; standard_price: number | null;
   description: string | null; preview_image: string | null; status: string;
   payment_link: string | null;
+  discount_payment_link: string | null;
 };
 
 export default function TemplateDetail() {
@@ -23,7 +24,7 @@ export default function TemplateDetail() {
     if (!templateId) return;
     supabase
       .from("templates")
-      .select("id,name,category,price,launch_price,standard_price,description,preview_image,status,payment_link")
+      .select("id,name,category,price,launch_price,standard_price,description,preview_image,status,payment_link,discount_payment_link")
       .eq("id", templateId)
       .eq("status", "published")
       .maybeSingle()
