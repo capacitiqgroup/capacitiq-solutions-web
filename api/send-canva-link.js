@@ -78,8 +78,21 @@ export default async function handler(req, res) {
     });
   }
 
-  // Internal notification
-  await fetch('https://api.resend.com/emails', {
+  // Internal notification (inline HTML — no helper dependency)
+  const date = new Date().toLocaleString('en-ZA', { timeZone: 'Africa/Johannesburg' });
+  const internalHtml = `
+<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:24px;">
+  <h2 style="color:#0b4650;">Template Canva Link Sent</h2>
+  <table style="width:100%;border-collapse:collapse;">
+    <tr><td style="padding:8px 0;color:#4a6670;width:160px;">Customer Email</td><td style="padding:8px 0;color:#0b4650;font-weight:bold;">${escHtml(customerEmail)}</td></tr>
+    <tr><td style="padding:8px 0;color:#4a6670;">Template</td><td style="padding:8px 0;color:#0b4650;">${escHtml(template.name)}</td></tr>
+    <tr><td style="padding:8px 0;color:#4a6670;">Amount</td><td style="padding:8px 0;color:#0b4650;">${price}</td></tr>
+    <tr><td style="padding:8px 0;color:#4a6670;">Date</td><td style="padding:8px 0;color:#0b4650;">${date}</td></tr>
+  </table>
+  <p style="font-family:Arial,sans-serif;font-size:12px;color:#4a6670;margin-top:16px;">This was sent from the thank you page after a Paystack payment.</p>
+</div>`;
+
+  const internalRes = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
@@ -89,9 +102,10 @@ export default async function handler(req, res) {
       from: 'noreply@capacitiq.co.za',
       to: 'hello@capacitiq.co.za',
       subject: `Template Canva Link Sent — ${template.name}`,
-      html: buildInternalNotice(template, customerEmail, price)
+      html: internalHtml
     })
   });
+  console.log('Internal notification:', internalRes.status, await internalRes.text());
 
   const orderId = crypto.randomUUID();
 
