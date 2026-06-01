@@ -184,17 +184,17 @@ export default function Checkout() {
                     </button>
                   ) : (
                     <>
-                      <a
-                        href={buildWhatsAppUrl()}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                      <button
+                        onClick={handleProceed}
                         className="w-full inline-flex items-center justify-center gap-3 rounded-2xl font-display font-bold uppercase tracking-wide"
                         style={{ height: 52, backgroundColor: "#e6ff2b", color: "#0b4650", fontFamily: "Ubuntu, system-ui, sans-serif" }}
                       >
-                        <MessageCircle size={20} /> Continue on WhatsApp
-                      </a>
+                        <MessageCircle size={20} /> {items.length === 1 && items[0].payment_link ? "Pay Securely with Paystack" : "Continue on WhatsApp"}
+                      </button>
                       <p className="text-xs text-center" style={{ color: "#4a6670", fontFamily: "Inter, system-ui, sans-serif" }}>
-                        For multi-template orders we send your payment link via WhatsApp and deliver your Canva links by email.
+                        {items.length === 1 && items[0].payment_link
+                          ? "You will be redirected to Paystack to complete payment. Your Canva link is delivered by email after payment."
+                          : "For multi-template orders we send your payment link via WhatsApp and deliver your Canva links by email."}
                       </p>
                     </>
                   )}
