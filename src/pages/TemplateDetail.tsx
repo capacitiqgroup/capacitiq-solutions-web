@@ -50,7 +50,7 @@ export default function TemplateDetail() {
 
   function add() {
     if (!t) return;
-    cart.addItem({ id: t.id, name: t.name, category: t.category, price: priceCents, preview_image: t.preview_image, launch_price: t.launch_price, standard_price: t.standard_price } as CartItem);
+    cart.addItem({ id: t.id, name: t.name, category: t.category, price: priceCents, preview_image: t.preview_image, launch_price: t.launch_price, standard_price: t.standard_price, payment_link: t.payment_link, discount_payment_link: t.discount_payment_link } as CartItem);
     setJustAdded(true);
     setTimeout(() => setJustAdded(false), 1500);
   }
