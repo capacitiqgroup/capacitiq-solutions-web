@@ -142,7 +142,7 @@ export default function Checkout() {
                       <CInput label="Company Name" value={info.company} onChange={(v) => setInfo({ ...info, company: v })} />
                     </>
                   )}
-                  <button className="btn-cta w-full" disabled={!validInfo} onClick={() => setStep(1)}>
+                  <button className="btn-cta w-full" disabled={!validInfo} onClick={handleContinueToReview}>
                     Continue
                   </button>
                 </div>
