@@ -87,8 +87,10 @@ export default function Templates() {
                 return (
                   <div key={t.id} className="neu-raised rounded-3xl p-5 flex flex-col">
                     {t.preview_image && (
-                      <Link to={`/templates/${t.id}`}>
-                        <img src={t.preview_image} alt={`${t.name} preview`} className="w-full aspect-square object-cover rounded-2xl" loading="lazy" />
+                      <Link to={`/templates/${t.id}`} className="block">
+                        <div className="img-16x9">
+                          <img src={t.preview_image} alt={`${t.name} preview`} loading="lazy" />
+                        </div>
                       </Link>
                     )}
                     <div className="mt-4 flex-1 flex flex-col">
