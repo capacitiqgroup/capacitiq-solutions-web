@@ -32,13 +32,18 @@ export default async function handler(req, res) {
     .select('id, name, canva_link, preview_image, launch_price, category')
     .eq('id', templateId)
     .eq('status', 'published')
-    .single();
+    .maybeSingle();
 
   console.log('Template lookup:', JSON.stringify({ template: template?.name, error: templateError?.message }));
 
-  if (templateError || !template) {
+  if (templateError) {
+    return res.status(500).json({ error: 'Database error. Please try again.' });
+  }
+
+  if (!template) {
+    console.log('No template found for id:', templateId);
     return res.status(404).json({
-      error: 'We could not find that template. If you have already paid, please contact us at hello@capacitiq.co.za or WhatsApp 064 062 0354 and we will send your link manually.'
+      error: 'We could not find that template. Please contact hello@capacitiq.co.za'
     });
   }
 
