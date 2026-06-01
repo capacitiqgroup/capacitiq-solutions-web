@@ -10,6 +10,7 @@ type T = {
   price: number; launch_price: number | null; standard_price: number | null;
   description: string | null; preview_image: string | null; status: string;
   payment_link: string | null;
+  discount_payment_link: string | null;
 };
 
 export default function TemplateDetail() {
@@ -23,7 +24,7 @@ export default function TemplateDetail() {
     if (!templateId) return;
     supabase
       .from("templates")
-      .select("id,name,category,price,launch_price,standard_price,description,preview_image,status,payment_link")
+      .select("id,name,category,price,launch_price,standard_price,description,preview_image,status,payment_link,discount_payment_link")
       .eq("id", templateId)
       .eq("status", "published")
       .maybeSingle()
@@ -49,7 +50,7 @@ export default function TemplateDetail() {
 
   function add() {
     if (!t) return;
-    cart.addItem({ id: t.id, name: t.name, category: t.category, price: priceCents, preview_image: t.preview_image, launch_price: t.launch_price, standard_price: t.standard_price } as CartItem);
+    cart.addItem({ id: t.id, name: t.name, category: t.category, price: priceCents, preview_image: t.preview_image, launch_price: t.launch_price, standard_price: t.standard_price, payment_link: t.payment_link, discount_payment_link: t.discount_payment_link } as CartItem);
     setJustAdded(true);
     setTimeout(() => setJustAdded(false), 1500);
   }

@@ -10,6 +10,7 @@ type T = {
   price: number; launch_price: number | null; standard_price: number | null;
   description: string | null; preview_image: string | null; status: string;
   payment_link: string | null;
+  discount_payment_link: string | null;
 };
 
 const CATEGORIES = ["All", "Social Media", "Presentations", "Business Docs", "Brand", "Email", "Events"];
@@ -23,7 +24,7 @@ export default function Templates() {
   useEffect(() => {
     supabase
       .from("templates")
-      .select("id,name,category,price,launch_price,standard_price,description,preview_image,status,payment_link")
+      .select("id,name,category,price,launch_price,standard_price,description,preview_image,status,payment_link,discount_payment_link")
       .eq("status", "published")
       .then(({ data }) => setItems((data as any) || []));
   }, []);
@@ -34,7 +35,7 @@ export default function Templates() {
   );
 
   function addToCart(t: T, priceCents: number) {
-    cart.addItem({ id: t.id, name: t.name, category: t.category, price: priceCents, preview_image: t.preview_image, launch_price: t.launch_price, standard_price: t.standard_price } as CartItem);
+    cart.addItem({ id: t.id, name: t.name, category: t.category, price: priceCents, preview_image: t.preview_image, launch_price: t.launch_price, standard_price: t.standard_price, payment_link: t.payment_link, discount_payment_link: t.discount_payment_link } as CartItem);
     setJustAdded(t.id);
     setTimeout(() => setJustAdded((cur) => (cur === t.id ? null : cur)), 1500);
   }
@@ -86,8 +87,10 @@ export default function Templates() {
                 return (
                   <div key={t.id} className="neu-raised rounded-3xl p-5 flex flex-col">
                     {t.preview_image && (
-                      <Link to={`/templates/${t.id}`}>
-                        <img src={t.preview_image} alt={`${t.name} preview`} className="w-full aspect-square object-cover rounded-2xl" loading="lazy" />
+                      <Link to={`/templates/${t.id}`} className="block">
+                        <div className="img-16x9">
+                          <img src={t.preview_image} alt={`${t.name} preview`} loading="lazy" />
+                        </div>
                       </Link>
                     )}
                     <div className="mt-4 flex-1 flex flex-col">

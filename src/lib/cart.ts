@@ -9,6 +9,8 @@ export type CartItem = {
   preview_image: string | null;
   standard_price?: number | null;
   launch_price?: number | null;
+  payment_link?: string | null;
+  discount_payment_link?: string | null;
 };
 
 export const formatZARDetailed = (cents: number) =>

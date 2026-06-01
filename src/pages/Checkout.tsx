@@ -51,12 +51,62 @@ export default function Checkout() {
         }),
       });
       if (!r.ok) { setError("Could not deliver the free template. Please try again."); setLoading(false); return; }
+      // Remove abandoned cart after successful free delivery
+      try {
+        await fetch("/api/save-abandoned-cart", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ customerEmail: info.email }),
+        });
+      } catch {}
       cart.clear();
       setStep(2);
     } catch {
       setError("Network error. Please try again.");
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function handleContinueToReview() {
+    // Save abandoned cart silently — do not block progression if this fails
+    try {
+      await fetch("/api/save-abandoned-cart", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customerEmail: info.email,
+          customerName: info.fullName,
+          cartItems: items.map((it) => ({
+            id: it.id,
+            name: it.name,
+            category: it.category,
+            launch_price: it.launch_price ?? it.price,
+            preview_image: it.preview_image,
+            payment_link: it.payment_link,
+            discount_payment_link: it.discount_payment_link,
+          })),
+        }),
+      });
+    } catch (e) {
+      console.log("Abandoned cart save failed silently");
+    }
+    setStep(1);
+  }
+
+  function handleProceed() {
+    if (items.length === 1 && items[0].payment_link) {
+      // Single paid item — open Paystack directly, also delete abandoned cart
+      try {
+        fetch("/api/save-abandoned-cart", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ customerEmail: info.email }),
+        });
+      } catch {}
+      window.open(items[0].payment_link!, "_blank");
+    } else {
+      window.open(buildWhatsAppUrl(), "_blank");
     }
   }
 
@@ -92,7 +142,7 @@ export default function Checkout() {
                       <CInput label="Company Name" value={info.company} onChange={(v) => setInfo({ ...info, company: v })} />
                     </>
                   )}
-                  <button className="btn-cta w-full" disabled={!validInfo} onClick={() => setStep(1)}>
+                  <button className="btn-cta w-full" disabled={!validInfo} onClick={handleContinueToReview}>
                     Continue
                   </button>
                 </div>
@@ -134,17 +184,17 @@ export default function Checkout() {
                     </button>
                   ) : (
                     <>
-                      <a
-                        href={buildWhatsAppUrl()}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                      <button
+                        onClick={handleProceed}
                         className="w-full inline-flex items-center justify-center gap-3 rounded-2xl font-display font-bold uppercase tracking-wide"
                         style={{ height: 52, backgroundColor: "#e6ff2b", color: "#0b4650", fontFamily: "Ubuntu, system-ui, sans-serif" }}
                       >
-                        <MessageCircle size={20} /> Continue on WhatsApp
-                      </a>
+                        <MessageCircle size={20} /> {items.length === 1 && items[0].payment_link ? "Pay Securely with Paystack" : "Continue on WhatsApp"}
+                      </button>
                       <p className="text-xs text-center" style={{ color: "#4a6670", fontFamily: "Inter, system-ui, sans-serif" }}>
-                        For multi-template orders we send your payment link via WhatsApp and deliver your Canva links by email.
+                        {items.length === 1 && items[0].payment_link
+                          ? "You will be redirected to Paystack to complete payment. Your Canva link is delivered by email after payment."
+                          : "For multi-template orders we send your payment link via WhatsApp and deliver your Canva links by email."}
                       </p>
                     </>
                   )}
