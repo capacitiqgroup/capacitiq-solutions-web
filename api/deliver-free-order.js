@@ -93,7 +93,21 @@ export default async function handler(req, res) {
     console.log('Customer email result:', emailRes.status, emailBody);
   }
 
-  await fetch('https://api.resend.com/emails', {
+  // Internal notification (inline HTML — no helper dependency)
+  const internalHtml = `
+<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:24px;">
+  <h2 style="color:#0b4650;">Free Template Downloaded</h2>
+  <table style="width:100%;border-collapse:collapse;">
+    <tr><td style="padding:8px 0;color:#4a6670;width:160px;">Customer Name</td><td style="padding:8px 0;color:#0b4650;font-weight:bold;">${escHtml(customerName)}</td></tr>
+    <tr><td style="padding:8px 0;color:#4a6670;">Customer Email</td><td style="padding:8px 0;color:#0b4650;">${escHtml(customerEmail)}</td></tr>
+    <tr><td style="padding:8px 0;color:#4a6670;">Templates</td><td style="padding:8px 0;color:#0b4650;">${templates.map(t => escHtml(t.name)).join(', ')}</td></tr>
+    <tr><td style="padding:8px 0;color:#4a6670;">Amount</td><td style="padding:8px 0;color:#0b4650;">FREE</td></tr>
+    <tr><td style="padding:8px 0;color:#4a6670;">Order ID</td><td style="padding:8px 0;color:#0b4650;">${escHtml(orderId)}</td></tr>
+    <tr><td style="padding:8px 0;color:#4a6670;">Date</td><td style="padding:8px 0;color:#0b4650;">${new Date().toLocaleString('en-ZA', {timeZone:'Africa/Johannesburg'})}</td></tr>
+  </table>
+</div>`;
+
+  const internalRes = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
@@ -103,9 +117,10 @@ export default async function handler(req, res) {
       from: 'noreply@capacitiq.co.za',
       to: 'hello@capacitiq.co.za',
       subject: `Free Template Downloaded — ${templates.map(t => t.name).join(', ')}`,
-      html: buildInternalNotification(templates, customerName, customerEmail, orderId, 'free')
+      html: internalHtml
     })
   });
+  console.log('Internal notification:', internalRes.status, await internalRes.text());
 
   await supabase.from('review_requests').insert({
     customer_email: customerEmail,
