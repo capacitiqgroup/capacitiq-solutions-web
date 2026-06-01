@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      abandoned_carts: {
+        Row: {
+          cart_items: Json
+          created_at: string
+          customer_email: string
+          customer_name: string | null
+          email_sent: boolean
+          email_sent_at: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          cart_items: Json
+          created_at?: string
+          customer_email: string
+          customer_name?: string | null
+          email_sent?: boolean
+          email_sent_at?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          cart_items?: Json
+          created_at?: string
+          customer_email?: string
+          customer_name?: string | null
+          email_sent?: boolean
+          email_sent_at?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       blog_posts: {
         Row: {
           author: string | null
@@ -410,6 +443,7 @@ export type Database = {
           category: string
           created_at: string
           description: string | null
+          discount_payment_link: string | null
           id: string
           launch_price: number | null
           name: string
@@ -424,6 +458,7 @@ export type Database = {
           category: string
           created_at?: string
           description?: string | null
+          discount_payment_link?: string | null
           id?: string
           launch_price?: number | null
           name: string
@@ -438,6 +473,7 @@ export type Database = {
           category?: string
           created_at?: string
           description?: string | null
+          discount_payment_link?: string | null
           id?: string
           launch_price?: number | null
           name?: string
