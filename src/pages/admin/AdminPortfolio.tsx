@@ -11,6 +11,7 @@ type Row = {
   category: string | null;
   excerpt: string | null;
   hero_image: string | null;
+  gallery_images: string[] | null;
   sections: Section[] | null;
   tags: string[] | null;
   status: string;
@@ -34,6 +35,7 @@ export default function AdminPortfolio() {
       title: editing.title, subtitle: editing.subtitle || null,
       category: editing.category, excerpt: editing.excerpt || null,
       hero_image: editing.hero_image || null,
+      gallery_images: (editing.gallery_images || []).filter((u) => u && u.trim()),
       sections: editing.sections || [],
       tags: editing.tags || null,
       status: editing.status || "published",
