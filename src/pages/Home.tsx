@@ -182,8 +182,8 @@ export default function Home() {
             <div className="grid md:grid-cols-3 gap-6">
               {portfolio.map((p) => (
                 <Link key={p.id} to={`/portfolio/${p.id}`} className="neu-raised rounded-3xl overflow-hidden group">
-                  <div className="aspect-video bg-[#cfe0e3] overflow-hidden">
-                    {p.hero_image && <img src={p.hero_image} alt={p.title} className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform" />}
+                  <div className="img-16x9" style={{ borderRadius: 0 }}>
+                    {p.hero_image && <img src={p.hero_image} alt={p.title} className="group-hover:scale-[1.02] transition-transform" />}
                   </div>
                   <div className="p-6">
                     {p.category && <span className="text-xs font-display font-bold rounded-full px-2.5 py-1" style={{ backgroundColor: "#e6ff2b", color: "#0b4650" }}>{p.category}</span>}
@@ -214,7 +214,9 @@ export default function Home() {
                 const orig = t.standard_price;
                 return (
                   <Link key={t.id} to={`/templates/${t.id}`} className="neu-raised rounded-3xl p-5 flex flex-col">
-                    {t.preview_image && <img src={t.preview_image} alt={`${t.name} preview`} className="w-full aspect-square object-cover rounded-2xl" loading="lazy" />}
+                    <div className="img-16x9">
+                      {t.preview_image && <img src={t.preview_image} alt={`${t.name} preview`} loading="lazy" />}
+                    </div>
                     <div className="mt-4">
                       <span className="text-xs font-display font-bold rounded-full px-2.5 py-1" style={{ backgroundColor: "#e6ff2b", color: "#0b4650" }}>{t.category}</span>
                       <h3 className="font-display font-bold text-lg mt-2" style={{ color: "#0b4650" }}>{t.name}</h3>
@@ -245,8 +247,14 @@ export default function Home() {
             <div className="grid md:grid-cols-3 gap-6">
               {posts.map((p) => (
                 <Link key={p.id} to={`/blog/${p.slug}`} className="neu-raised rounded-3xl overflow-hidden group">
-                  <div className="aspect-video bg-[#cfe0e3] overflow-hidden">
-                    {p.featured_image && <img src={p.featured_image} alt={p.title} className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform" />}
+                  <div className="img-16x9" style={{ borderRadius: 0 }}>
+                    {p.featured_image ? (
+                      <img src={p.featured_image} alt={p.title} className="group-hover:scale-[1.02] transition-transform" />
+                    ) : (
+                      <div style={{ width: "100%", height: "100%", background: "#0b4650", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <img src="https://res.cloudinary.com/dewvhnks3/image/upload/v1779812887/4_20260526_182654_0001_ib6yj1.svg" alt="Capacitiq" style={{ width: 40, height: 40, opacity: 0.6 }} />
+                      </div>
+                    )}
                   </div>
                   <div className="p-5">
                     {p.category && <span className="text-xs font-display font-bold rounded-full px-2.5 py-1" style={{ backgroundColor: "#e6ff2b", color: "#0b4650" }}>{p.category}</span>}
@@ -286,6 +294,16 @@ export default function Home() {
                   </div>
                 </div>
               ))}
+            </div>
+            <div style={{ display: "flex", gap: "16px", justifyContent: "center", flexWrap: "wrap", marginTop: "24px", alignItems: "center" }}>
+              <a href="https://g.page/r/CfMNt5hlybN9EBM/review" target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: "10px", background: "#e8edf0", padding: "12px 20px", borderRadius: "50px", textDecoration: "none", border: "none", boxShadow: "6px 6px 12px #c5cdd4, -6px -6px 12px #ffffff" }}>
+                <img src="https://res.cloudinary.com/dewvhnks3/image/upload/v1780299742/download_mm2adq.png" alt="Google Business Profile" style={{ height: "24px", width: "auto", display: "block", border: "0" }} />
+                <span style={{ fontFamily: "Ubuntu, sans-serif", fontWeight: 700, fontSize: "13px", color: "#0b4650", textTransform: "uppercase", letterSpacing: "0.05em" }}>Leave a Review</span>
+              </a>
+              <a href="https://www.hellopeter.com/capacitiq" target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: "10px", background: "#e8edf0", padding: "12px 20px", borderRadius: "50px", textDecoration: "none", border: "none", boxShadow: "6px 6px 12px #c5cdd4, -6px -6px 12px #ffffff" }}>
+                <img src="https://res.cloudinary.com/dewvhnks3/image/upload/v1780299684/hellopeter_logo_l48gln.jpg" alt="HelloPeter" style={{ height: "24px", width: "auto", display: "block", border: "0" }} />
+                <span style={{ fontFamily: "Ubuntu, sans-serif", fontWeight: 700, fontSize: "13px", color: "#0b4650", textTransform: "uppercase", letterSpacing: "0.05em" }}>Leave a Review</span>
+              </a>
             </div>
           </div>
         )}

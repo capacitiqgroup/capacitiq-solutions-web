@@ -65,8 +65,8 @@ export default function BlogDetail() {
           <h1 className="font-display font-bold text-4xl sm:text-5xl mt-4" style={{ color: "#0b4650" }}>{post.title}</h1>
           <p className="text-sm text-muted mt-3">{post.author || "Capacitiq Team"} · {post.publish_date}</p>
           {post.featured_image && (
-            <div className="neu-raised rounded-3xl p-3 mt-8">
-              <img src={post.featured_image} alt={post.title} className="w-full aspect-video object-cover rounded-2xl" />
+            <div className="img-16x9 rounded-neu mt-8">
+              <img src={post.featured_image} alt={post.title} />
             </div>
           )}
           <div className="mt-8" dangerouslySetInnerHTML={{ __html: renderBody(post.body || "") }} />

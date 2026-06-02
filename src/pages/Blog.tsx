@@ -58,8 +58,14 @@ export default function Blog() {
               {featured && (
                 <Link to={`/blog/${featured.slug}`} className="block neu-raised rounded-3xl overflow-hidden mb-8 group">
                   <div className="grid md:grid-cols-2 gap-0">
-                    <div className="aspect-video md:aspect-auto bg-[#cfe0e3] overflow-hidden">
-                      {featured.featured_image && <img src={featured.featured_image} alt={featured.title} className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform" />}
+                    <div className="img-16x9" style={{ borderRadius: 0 }}>
+                      {featured.featured_image ? (
+                        <img src={featured.featured_image} alt={featured.title} className="group-hover:scale-[1.02] transition-transform" />
+                      ) : (
+                        <div style={{ width: "100%", height: "100%", background: "#0b4650", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          <img src="https://res.cloudinary.com/dewvhnks3/image/upload/v1779812887/4_20260526_182654_0001_ib6yj1.svg" alt="Capacitiq" style={{ width: 40, height: 40, opacity: 0.6 }} />
+                        </div>
+                      )}
                     </div>
                     <div className="p-8 flex flex-col justify-center">
                       {featured.category && <span className="text-xs font-display font-bold rounded-full px-2.5 py-1 self-start" style={{ backgroundColor: "#e6ff2b", color: "#0b4650" }}>{featured.category}</span>}
@@ -74,8 +80,14 @@ export default function Blog() {
                 <div className="grid md:grid-cols-3 gap-6">
                   {rest.map((p) => (
                     <Link key={p.id} to={`/blog/${p.slug}`} className="neu-raised rounded-3xl overflow-hidden group">
-                      <div className="aspect-video bg-[#cfe0e3] overflow-hidden">
-                        {p.featured_image && <img src={p.featured_image} alt={p.title} className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform" />}
+                      <div className="img-16x9" style={{ borderRadius: 0 }}>
+                        {p.featured_image ? (
+                          <img src={p.featured_image} alt={p.title} className="group-hover:scale-[1.02] transition-transform" />
+                        ) : (
+                          <div style={{ width: "100%", height: "100%", background: "#0b4650", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                            <img src="https://res.cloudinary.com/dewvhnks3/image/upload/v1779812887/4_20260526_182654_0001_ib6yj1.svg" alt="Capacitiq" style={{ width: 40, height: 40, opacity: 0.6 }} />
+                          </div>
+                        )}
                       </div>
                       <div className="p-5">
                         {p.category && <span className="text-xs font-display font-bold rounded-full px-2.5 py-1" style={{ backgroundColor: "#e6ff2b", color: "#0b4650" }}>{p.category}</span>}

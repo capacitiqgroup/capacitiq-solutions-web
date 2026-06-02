@@ -64,17 +64,8 @@ export default function TemplateDetail() {
         <div className="max-w-5xl mx-auto">
           <Link to="/templates" className="inline-flex items-center gap-1 text-sm text-[#4a6670] hover:text-[#0b4650]"><ArrowLeft size={14} /> Back to Templates</Link>
           <div className="grid md:grid-cols-2 gap-8 mt-6">
-            <div
-              className="neu-raised rounded-3xl flex items-center justify-center"
-              style={{ background: "#e8edf0", padding: 24, borderRadius: 20, width: "100%", maxWidth: "100%" }}
-            >
-              {t.preview_image && (
-                <img
-                  src={t.preview_image}
-                  alt={`${t.name} preview`}
-                  style={{ width: "100%", maxWidth: "100%", maxHeight: 560, objectFit: "contain", borderRadius: 12, display: "block", height: "auto" }}
-                />
-              )}
+            <div className="img-16x9 contain rounded-neu">
+              {t.preview_image && <img src={t.preview_image} alt={`${t.name} preview`} />}
             </div>
             <div>
               <span className="text-xs font-display font-bold rounded-full px-2.5 py-1" style={{ backgroundColor: "#e6ff2b", color: "#0b4650" }}>{t.category}</span>

@@ -11,6 +11,7 @@ type Row = {
   category: string | null;
   excerpt: string | null;
   hero_image: string | null;
+  gallery_images: string[] | null;
   sections: Section[] | null;
   tags: string[] | null;
   status: string;
@@ -34,6 +35,7 @@ export default function AdminPortfolio() {
       title: editing.title, subtitle: editing.subtitle || null,
       category: editing.category, excerpt: editing.excerpt || null,
       hero_image: editing.hero_image || null,
+      gallery_images: (editing.gallery_images || []).filter((u) => u && u.trim()),
       sections: editing.sections || [],
       tags: editing.tags || null,
       status: editing.status || "published",
@@ -90,6 +92,45 @@ export default function AdminPortfolio() {
           </Field>
           <Field label="Excerpt *"><textarea rows={2} className="neu-inset w-full p-3 text-sm" value={editing.excerpt || ""} onChange={(e) => setEditing({ ...editing, excerpt: e.target.value })} /></Field>
           <Field label="Hero Image URL * (16x9)"><input className="neu-inset w-full p-3 text-sm" value={editing.hero_image || ""} onChange={(e) => setEditing({ ...editing, hero_image: e.target.value })} /></Field>
+          <div className="mb-4">
+            <label style={{ display: "block", fontFamily: "Inter, sans-serif", fontSize: "13px", color: "#0b4650", marginBottom: "6px", fontWeight: 500 }}>
+              Additional Gallery Images
+              <span style={{ fontWeight: 400, color: "#4a6670", marginLeft: "8px", fontSize: "12px" }}>Optional — up to 10 images, 16x9 ratio</span>
+            </label>
+            {(editing.gallery_images || []).map((url, index) => (
+              <div key={index} style={{ display: "flex", gap: "8px", marginBottom: "8px", alignItems: "center" }}>
+                <input
+                  type="text"
+                  value={url}
+                  onChange={(e) => {
+                    const updated = [...(editing.gallery_images || [])];
+                    updated[index] = e.target.value;
+                    setEditing({ ...editing, gallery_images: updated });
+                  }}
+                  placeholder={`Image ${index + 1} URL — paste Cloudinary link`}
+                  className="neu-inset"
+                  style={{ flex: 1, padding: "10px 14px", fontFamily: "Inter, sans-serif", fontSize: "13px", color: "#0b4650" }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setEditing({ ...editing, gallery_images: (editing.gallery_images || []).filter((_, i) => i !== index) })}
+                  style={{ background: "#e8edf0", border: "none", borderRadius: "50%", width: "36px", height: "36px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", boxShadow: "4px 4px 8px #c5cdd4, -4px -4px 8px #ffffff", flexShrink: 0 }}
+                  aria-label="Remove image"
+                >
+                  <Trash2 size={14} color="#dc2626" />
+                </button>
+              </div>
+            ))}
+            {(editing.gallery_images || []).length < 10 && (
+              <button
+                type="button"
+                onClick={() => setEditing({ ...editing, gallery_images: [...(editing.gallery_images || []), ""] })}
+                style={{ background: "#e8edf0", border: "none", borderRadius: "12px", padding: "10px 20px", fontFamily: "Ubuntu, sans-serif", fontWeight: 700, fontSize: "13px", color: "#0b4650", cursor: "pointer", boxShadow: "4px 4px 8px #c5cdd4, -4px -4px 8px #ffffff", textTransform: "uppercase", letterSpacing: "0.05em" }}
+              >
+                + Add Image
+              </button>
+            )}
+          </div>
           <div className="mb-3">
             <label className="font-display text-sm block mb-2" style={{ color: "#0b4650" }}>Sections</label>
             {(editing.sections || []).map((s, i) => (
