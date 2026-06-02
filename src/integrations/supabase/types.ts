@@ -274,6 +274,7 @@ export type Database = {
           category: string | null
           created_at: string
           excerpt: string | null
+          gallery_images: Json | null
           hero_image: string | null
           id: string
           sections: Json | null
@@ -286,6 +287,7 @@ export type Database = {
           category?: string | null
           created_at?: string
           excerpt?: string | null
+          gallery_images?: Json | null
           hero_image?: string | null
           id?: string
           sections?: Json | null
@@ -298,6 +300,7 @@ export type Database = {
           category?: string | null
           created_at?: string
           excerpt?: string | null
+          gallery_images?: Json | null
           hero_image?: string | null
           id?: string
           sections?: Json | null
