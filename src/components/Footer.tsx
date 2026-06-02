@@ -82,10 +82,14 @@ export function Footer() {
             </div>
           </div>
           <Link to="/contact" className="btn-cta">Get a Free Consultation</Link>
-          <a href="https://share.google/YeIYI2CfeNwysKbhx" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 text-xs text-[#4a6670]">
-            <span aria-hidden="true" className="inline-flex w-4 h-4 rounded-full items-center justify-center text-[9px] font-bold text-white" style={{ background: "conic-gradient(#4285F4 0 25%, #EA4335 25% 50%, #FBBC05 50% 75%, #34A853 75% 100%)" }}>G</span>
-            Review us on Google
-          </a>
+          <div style={{ display: "flex", gap: "16px", alignItems: "center", flexWrap: "wrap" }}>
+            <a href="https://share.google/YeIYI2CfeNwysKbhx" target="_blank" rel="noopener noreferrer" style={{ display: "inline-block", textDecoration: "none", border: "none" }}>
+              <img src="https://res.cloudinary.com/dewvhnks3/image/upload/v1780299742/download_mm2adq.png" alt="Review us on Google Business Profile" style={{ height: "32px", width: "auto", display: "block", border: "0" }} />
+            </a>
+            <a href="https://www.hellopeter.com/capacitiq" target="_blank" rel="noopener noreferrer" style={{ display: "inline-block", textDecoration: "none", border: "none" }}>
+              <img src="https://res.cloudinary.com/dewvhnks3/image/upload/v1780299684/hellopeter_logo_l48gln.jpg" alt="Review us on HelloPeter" style={{ height: "32px", width: "auto", display: "block", border: "0" }} />
+            </a>
+          </div>
           <p className="text-xs text-muted text-center">© 2026 Capacitiq Solutions (Pty) Ltd</p>
           <button
             onClick={() => { localStorage.removeItem("capacitiq_cookie_consent"); window.location.reload(); }}
