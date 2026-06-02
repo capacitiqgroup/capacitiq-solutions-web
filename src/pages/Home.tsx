@@ -295,6 +295,16 @@ export default function Home() {
                 </div>
               ))}
             </div>
+            <div style={{ display: "flex", gap: "16px", justifyContent: "center", flexWrap: "wrap", marginTop: "24px", alignItems: "center" }}>
+              <a href="https://g.page/r/CfMNt5hlybN9EBM/review" target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: "10px", background: "#e8edf0", padding: "12px 20px", borderRadius: "50px", textDecoration: "none", border: "none", boxShadow: "6px 6px 12px #c5cdd4, -6px -6px 12px #ffffff" }}>
+                <img src="https://res.cloudinary.com/dewvhnks3/image/upload/v1780299742/download_mm2adq.png" alt="Google Business Profile" style={{ height: "24px", width: "auto", display: "block", border: "0" }} />
+                <span style={{ fontFamily: "Ubuntu, sans-serif", fontWeight: 700, fontSize: "13px", color: "#0b4650", textTransform: "uppercase", letterSpacing: "0.05em" }}>Leave a Review</span>
+              </a>
+              <a href="https://www.hellopeter.com/capacitiq" target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: "10px", background: "#e8edf0", padding: "12px 20px", borderRadius: "50px", textDecoration: "none", border: "none", boxShadow: "6px 6px 12px #c5cdd4, -6px -6px 12px #ffffff" }}>
+                <img src="https://res.cloudinary.com/dewvhnks3/image/upload/v1780299684/hellopeter_logo_l48gln.jpg" alt="HelloPeter" style={{ height: "24px", width: "auto", display: "block", border: "0" }} />
+                <span style={{ fontFamily: "Ubuntu, sans-serif", fontWeight: 700, fontSize: "13px", color: "#0b4650", textTransform: "uppercase", letterSpacing: "0.05em" }}>Leave a Review</span>
+              </a>
+            </div>
           </div>
         )}
         <div className="max-w-3xl mx-auto">
