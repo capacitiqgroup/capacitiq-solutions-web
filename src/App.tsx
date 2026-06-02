@@ -29,6 +29,7 @@ import AdminTemplates from "@/pages/admin/AdminTemplates";
 import AdminPortfolio from "@/pages/admin/AdminPortfolio";
 import AdminReviews from "@/pages/admin/AdminReviews";
 import AdminOrders from "@/pages/admin/AdminOrders";
+import AdminAbandonedCarts from "@/pages/admin/AdminAbandonedCarts";
 
 function usePageTracking() {
   const location = useLocation();
@@ -56,6 +57,7 @@ export default function App() {
           <Route path="templates" element={<AdminTemplates />} />
           <Route path="portfolio" element={<AdminPortfolio />} />
           <Route path="orders" element={<AdminOrders />} />
+          <Route path="abandoned-carts" element={<AdminAbandonedCarts />} />
           <Route path="reviews" element={<AdminReviews />} />
         </Route>
 
